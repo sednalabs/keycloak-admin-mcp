@@ -111,10 +111,9 @@ impl AppState {
             .map_err(|err| format!("failed to build gateway client: {err}"))?;
 
         let tool_list_tracker = Arc::new(ToolListTracker::new());
-        let session_config = SessionConfig {
-            channel_capacity: config.streamable_http.max_events,
-            keep_alive: config.streamable_http.ttl,
-        };
+        let mut session_config = SessionConfig::default();
+        session_config.channel_capacity = config.streamable_http.max_events;
+        session_config.keep_alive = config.streamable_http.ttl;
         let session_manager = Arc::new(BoundedSessionManager::new(
             LocalSessionManager::default(),
             config.streamable_http.max_streams,
@@ -138,6 +137,9 @@ impl AppState {
         let service_started = started_at;
         let service_provenance = runtime_provenance.clone();
         let service_runtime_admission = runtime_admission.clone();
+        let mut stateful_http_config = StreamableHttpServerConfig::default();
+        stateful_http_config.sse_retry = sse_retry;
+        stateful_http_config.cancellation_token = cancellation_token.child_token();
         let stateful_service = StreamableHttpService::new(
             move || {
                 Ok(KcAdminMcp::new(
@@ -152,11 +154,7 @@ impl AppState {
                 ))
             },
             recording_session_manager.clone(),
-            StreamableHttpServerConfig {
-                sse_retry,
-                cancellation_token: cancellation_token.child_token(),
-                ..Default::default()
-            },
+            stateful_http_config,
         );
         let stateless_service = if config.streamable_http.stateless_fallback {
             let stateless_config = config.clone();
@@ -167,6 +165,10 @@ impl AppState {
             let stateless_started = started_at;
             let stateless_provenance = runtime_provenance.clone();
             let stateless_runtime_admission = runtime_admission.clone();
+            let mut stateless_http_config = StreamableHttpServerConfig::default();
+            stateless_http_config.sse_retry = None;
+            stateless_http_config.stateful_mode = false;
+            stateless_http_config.cancellation_token = cancellation_token.child_token();
             Some(StreamableHttpService::new(
                 move || {
                     Ok(KcAdminMcp::new(
@@ -181,12 +183,7 @@ impl AppState {
                     ))
                 },
                 recording_session_manager.clone(),
-                StreamableHttpServerConfig {
-                    sse_retry: None,
-                    stateful_mode: false,
-                    cancellation_token: cancellation_token.child_token(),
-                    ..Default::default()
-                },
+                stateless_http_config,
             ))
         } else {
             None
