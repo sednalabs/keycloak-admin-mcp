@@ -1,0 +1,76 @@
+name: CodeQL Advanced
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "41 7 * * 2"
+  workflow_dispatch:
+    inputs:
+      upload_results:
+        description: "Upload SARIF to code scanning; use only after code scanning is available."
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-advanced::${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CODEQL_UPLOAD_MODE: ${{ (!github.event.repository.private || vars.CODEQL_UPLOAD_ENABLED == 'true' || inputs.upload_results == true) && 'always' || 'never' }}
+
+jobs:
+  analyze:
+    name: Analyze Rust
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        # actions/checkout v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Record CodeQL upload mode
+        run: |
+          {
+            echo "### CodeQL upload mode"
+            echo
+            echo "- Repository private: \`${{ github.event.repository.private }}\`"
+            echo "- Upload mode: \`${CODEQL_UPLOAD_MODE}\`"
+            echo
+            if [ "${CODEQL_UPLOAD_MODE}" = "never" ]; then
+              echo "SARIF upload is disabled for this run because code scanning is not currently available in this private repository."
+              echo "The workflow still runs CodeQL analysis and will upload automatically after public visibility, or when maintainers set \`CODEQL_UPLOAD_ENABLED=true\` or dispatch with \`upload_results=true\`."
+            else
+              echo "SARIF upload is enabled for this run."
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Initialize CodeQL
+        # github/codeql-action v4
+        uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e
+        with:
+          languages: rust
+          build-mode: none
+          queries: security-extended,security-and-quality
+
+      - name: Perform CodeQL analysis
+        # github/codeql-action v4
+        uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e
+        with:
+          category: "/language:rust"
+          upload: ${{ env.CODEQL_UPLOAD_MODE }}

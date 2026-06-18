@@ -1,0 +1,29 @@
+[package]
+name = "kc-admin-gateway"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
+axum = { version = "0.8.8", features = ["json"] }
+axum-server = { version = "0.8.0", features = ["tls-rustls"] }
+tokio = { version = "1.49.0", features = ["rt-multi-thread", "macros", "signal"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+reqwest = { version = "0.13.1", default-features = false, features = ["json", "form", "rustls"] }
+thiserror = "2.0.18"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "fmt", "json"] }
+uuid = { version = "1.19.0", features = ["v4"] }
+rustls = { version = "0.23.36", default-features = false, features = ["aws-lc-rs"] }
+sha2 = "0.10.9"
+hex = "0.4.3"
+regex = "1.12.2"
+time = { version = "0.3.47", features = ["formatting", "parsing"] }
+mcp-toolkit-auth = { workspace = true }
+mcp-toolkit-observability = { workspace = true }
+mcp-toolkit-policy-core = { workspace = true }
+
+[dev-dependencies]
+http = "1.4.0"
+tower = "0.5.3"

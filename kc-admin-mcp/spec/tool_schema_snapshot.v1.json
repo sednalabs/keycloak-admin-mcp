@@ -1,0 +1,3803 @@
+{
+  "schema": "mcp_tool_schema_snapshot",
+  "tools": [
+    {
+      "description": "Clear admin events in a realm (confirm=true).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `events.clear` and `admin_events.clear`.\nRequired scopes: `keycloak-admin:events:admin` (configurable); safety: destructive (clears event records).\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "confirm": {
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm"
+        ],
+        "title": "EventsClearArgs",
+        "type": "object"
+      },
+      "name": "admin_events.clear"
+    },
+    {
+      "description": "List admin events in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `admin_events.list`.\nRequired scopes: `keycloak-admin:events:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "authClient": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "authIpAddress": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "authRealm": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "authUser": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dateFrom": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dateTo": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "first": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "operationTypes": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "resourcePath": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "resourceTypes": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "AdminEventsListArgs",
+        "type": "object"
+      },
+      "name": "admin_events.list"
+    },
+    {
+      "description": "Write a hash-chain checkpoint file and return the latest hash.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "audit.checkpoint"
+    },
+    {
+      "description": "List recent tool invocations (in-memory ring buffer).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `audit.list`.\nRequired scopes: `keycloak-admin:observability:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "limit": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "title": "AuditListArgs",
+        "type": "object"
+      },
+      "name": "audit.list"
+    },
+    {
+      "description": "Create a client initial access token.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_initial_access.create`.\nRequired scopes: `keycloak-admin:realm:admin` (configurable); safety: creates initial access tokens.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "count": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "expiration": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientInitialAccessCreateArgs",
+        "type": "object"
+      },
+      "name": "client_initial_access.create"
+    },
+    {
+      "description": "Delete a client initial access token.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_initial_access.delete`.\nRequired scopes: `keycloak-admin:realm:admin` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "id"
+        ],
+        "title": "ClientInitialAccessDeleteArgs",
+        "type": "object"
+      },
+      "name": "client_initial_access.delete"
+    },
+    {
+      "description": "List client initial access tokens for a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for realm-scoped tools.\nRequired scopes vary by tool (`realm:read`, `realm:write`, or `realm:admin`); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "RealmArgs",
+        "type": "object"
+      },
+      "name": "client_initial_access.list"
+    },
+    {
+      "description": "Create client registration policy configuration (Allowed Client Scopes).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Captures inputs for creating a client registration policy component.\n\n# Errors\n* The handler returns an error if required fields are missing or malformed.\n\n# Security\n* Creates registration policy configuration via the gateway.\n\n# Caveats\n* `allowed_scopes` is serialized into Keycloak component config list entries.",
+        "properties": {
+          "allow_default_scopes": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "allowed_scopes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "provider_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientRegistrationPolicyCreateArgs",
+        "type": "object"
+      },
+      "name": "client_registration.policies.create"
+    },
+    {
+      "description": "Delete client registration policy configuration.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Captures inputs for deleting a client registration policy component.\n\n# Errors\n* The handler returns an error if required fields are missing or malformed.\n\n# Security\n* Deletes registration policy configuration via the gateway.\n\n# Caveats\n* When multiple components match, the handler requires a more specific selector.",
+        "properties": {
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "provider_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientRegistrationPolicyDeleteArgs",
+        "type": "object"
+      },
+      "name": "client_registration.policies.delete"
+    },
+    {
+      "description": "List client registration policy providers for a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for realm-scoped tools.\nRequired scopes vary by tool (`realm:read`, `realm:write`, or `realm:admin`); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "RealmArgs",
+        "type": "object"
+      },
+      "name": "client_registration.policies.list"
+    },
+    {
+      "description": "Update client registration policy configuration (Allowed Client Scopes).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Captures inputs for updating a client registration policy component.\n\n# Errors\n* The handler returns an error if required fields are missing or malformed.\n\n# Security\n* Writes registration policy configuration via the gateway.\n\n# Caveats\n* `allowed_scopes` is serialized into Keycloak component config list entries.",
+        "properties": {
+          "allow_default_scopes": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "allowed_scopes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "provider_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientRegistrationPolicyUpdateArgs",
+        "type": "object"
+      },
+      "name": "client_registration.policies.update"
+    },
+    {
+      "description": "Create a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.create`.\nRequired scopes: `keycloak-admin:client-scopes:write` (configurable); safety: writes client scope data.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "description": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "protocol": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "ClientScopeCreateArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.create"
+    },
+    {
+      "description": "Delete a client scope by id or name.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.delete`.\nRequired scopes: `keycloak-admin:client-scopes:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopeDeleteArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.delete"
+    },
+    {
+      "description": "Fetch a client scope by id or name.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.get`.\nRequired scopes: `keycloak-admin:client-scopes:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopeGetArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.get"
+    },
+    {
+      "description": "List client scopes in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.list`.\nRequired scopes: `keycloak-admin:client-scopes:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopesListArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.list"
+    },
+    {
+      "description": "Add a protocol mapper to a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.protocol_mappers.add`.\nRequired scopes: `keycloak-admin:client-scopes:write` (configurable); safety: writes protocol mapper config.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "config": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": null,
+            "nullable": true,
+            "type": "object"
+          },
+          "mapper_name": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "protocol_mapper": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "mapper_name",
+          "protocol",
+          "protocol_mapper"
+        ],
+        "title": "ClientScopeProtocolMapperAddArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.protocol_mappers.add"
+    },
+    {
+      "description": "Delete a protocol mapper from a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.protocol_mappers.delete`.\nRequired scopes: `keycloak-admin:client-scopes:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "mapper_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "mapper_id"
+        ],
+        "title": "ClientScopeProtocolMapperDeleteArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.protocol_mappers.delete"
+    },
+    {
+      "description": "List protocol mappers for a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.protocol_mappers.list`.\nRequired scopes: `keycloak-admin:client-scopes:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "include_config": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopeProtocolMapperListArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.protocol_mappers.list"
+    },
+    {
+      "description": "List realm scope mappings for a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for client-scope scope-mapping reads.\nRequired scopes: `keycloak-admin:client-scopes:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopeRefArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.scope_mappings.realm"
+    },
+    {
+      "description": "Add realm scope mappings to a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.scope_mappings.realm.add` and `.delete`.\nRequired scopes: `keycloak-admin:client-scopes:write` (configurable); safety: writes realm scope mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopeScopeMappingsRealmModifyArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.scope_mappings.realm.add"
+    },
+    {
+      "description": "Remove realm scope mappings from a client scope.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `client_scopes.scope_mappings.realm.add` and `.delete`.\nRequired scopes: `keycloak-admin:client-scopes:write` (configurable); safety: writes realm scope mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientScopeScopeMappingsRealmModifyArgs",
+        "type": "object"
+      },
+      "name": "client_scopes.scope_mappings.realm.delete"
+    },
+    {
+      "description": "Update multiple clients in a single call (confirm=true).",
+      "inputSchema": {
+        "$defs": {
+          "ClientsBulkUpdateItem": {
+            "description": "Per-client update payload for `clients.bulk_update`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+            "properties": {
+              "bearer_only": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              },
+              "client_id": {
+                "default": null,
+                "nullable": true,
+                "type": "string"
+              },
+              "consent_required": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              },
+              "description": {
+                "default": null,
+                "nullable": true,
+                "type": "string"
+              },
+              "direct_access_grants_enabled": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              },
+              "enabled": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              },
+              "id": {
+                "default": null,
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "default": null,
+                "nullable": true,
+                "type": "string"
+              },
+              "public_client": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              },
+              "service_accounts_enabled": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              },
+              "standard_flow_enabled": {
+                "default": null,
+                "nullable": true,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.bulk_update`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes multiple clients.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "confirm": {
+            "type": "boolean"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "updates": {
+            "items": {
+              "$ref": "#/$defs/ClientsBulkUpdateItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm",
+          "updates"
+        ],
+        "title": "ClientsBulkUpdateArgs",
+        "type": "object"
+      },
+      "name": "clients.bulk_update"
+    },
+    {
+      "description": "Create a new client in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.create`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "protocol": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "public_client": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "service_accounts_enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "realm",
+          "client_id"
+        ],
+        "title": "ClientsCreateArgs",
+        "type": "object"
+      },
+      "name": "clients.create"
+    },
+    {
+      "description": "List default client scopes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for client scope list operations on a client.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesArgs",
+        "type": "object"
+      },
+      "name": "clients.default_scopes"
+    },
+    {
+      "description": "Attach one or more default client scopes to a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for adding or removing default/optional client scopes.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client scope mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesMutationArgs",
+        "type": "object"
+      },
+      "name": "clients.default_scopes.add"
+    },
+    {
+      "description": "Remove one or more default client scopes from a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for adding or removing default/optional client scopes.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client scope mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesMutationArgs",
+        "type": "object"
+      },
+      "name": "clients.default_scopes.delete"
+    },
+    {
+      "description": "Replace all default client scopes with the provided set.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for replacing all default or optional client scopes.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: destructive without `allow_empty`.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "allow_empty": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm"
+        ],
+        "title": "ClientsScopesReplaceArgs",
+        "type": "object"
+      },
+      "name": "clients.default_scopes.replace"
+    },
+    {
+      "description": "Delete a client by id or clientId.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.delete`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsDeleteArgs",
+        "type": "object"
+      },
+      "name": "clients.delete"
+    },
+    {
+      "description": "Disable a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.enable` and `clients.disable`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes enablement state.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsToggleArgs",
+        "type": "object"
+      },
+      "name": "clients.disable"
+    },
+    {
+      "description": "Enable a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.enable` and `clients.disable`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes enablement state.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsToggleArgs",
+        "type": "object"
+      },
+      "name": "clients.enable"
+    },
+    {
+      "description": "Get a client by id or clientId.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.get`.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsGetArgs",
+        "type": "object"
+      },
+      "name": "clients.get"
+    },
+    {
+      "description": "Create a hardened introspection-only client (confirm=true).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.introspection.create`.\nRequired scopes: `keycloak-admin:clients:write` and `keycloak-admin:clients:secrets` (configurable); safety: issues secrets.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "client_id",
+          "confirm"
+        ],
+        "title": "ClientsIntrospectionCreateArgs",
+        "type": "object"
+      },
+      "name": "clients.introspection.create"
+    },
+    {
+      "description": "List clients within a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.list`.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "search": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsListArgs",
+        "type": "object"
+      },
+      "name": "clients.list"
+    },
+    {
+      "description": "List optional client scopes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for client scope list operations on a client.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesArgs",
+        "type": "object"
+      },
+      "name": "clients.optional_scopes"
+    },
+    {
+      "description": "Attach one or more optional client scopes to a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for adding or removing default/optional client scopes.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client scope mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesMutationArgs",
+        "type": "object"
+      },
+      "name": "clients.optional_scopes.add"
+    },
+    {
+      "description": "Remove one or more optional client scopes from a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for adding or removing default/optional client scopes.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client scope mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesMutationArgs",
+        "type": "object"
+      },
+      "name": "clients.optional_scopes.delete"
+    },
+    {
+      "description": "Replace all optional client scopes with the provided set.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for replacing all default or optional client scopes.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: destructive without `allow_empty`.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "allow_empty": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm"
+        ],
+        "title": "ClientsScopesReplaceArgs",
+        "type": "object"
+      },
+      "name": "clients.optional_scopes.replace"
+    },
+    {
+      "description": "Add a protocol mapper to a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.protocol_mappers.add`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes protocol mapper config.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "config": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": null,
+            "nullable": true,
+            "type": "object"
+          },
+          "consent_required": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "consent_text": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "protocol_mapper": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name",
+          "protocol",
+          "protocol_mapper"
+        ],
+        "title": "ClientsProtocolMapperAddArgs",
+        "type": "object"
+      },
+      "name": "clients.protocol_mappers.add"
+    },
+    {
+      "description": "Delete a protocol mapper from a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.protocol_mappers.delete`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "mapper_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "mapper_id"
+        ],
+        "title": "ClientsProtocolMapperDeleteArgs",
+        "type": "object"
+      },
+      "name": "clients.protocol_mappers.delete"
+    },
+    {
+      "description": "List protocol mappers for a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.protocol_mappers.list`.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "include_config": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsProtocolMapperListArgs",
+        "type": "object"
+      },
+      "name": "clients.protocol_mappers.list"
+    },
+    {
+      "description": "Disable or delete clients matching the provided filters (confirm=true).",
+      "inputSchema": {
+        "$defs": {
+          "ClientsPruneAction": {
+            "description": "Prune action for `clients.prune`.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+            "enum": [
+              "disable",
+              "delete"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.prune`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: destructive unless `dry_run` is true.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ClientsPruneAction"
+              },
+              {
+                "const": null,
+                "nullable": true
+              }
+            ]
+          },
+          "client_id_pattern": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "client_id_prefix": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "exclude_client_ids": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "limit": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "search": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm"
+        ],
+        "title": "ClientsPruneArgs",
+        "type": "object"
+      },
+      "name": "clients.prune"
+    },
+    {
+      "description": "Replace redirect URIs for a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.redirect_uris.update`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes redirect URIs.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "redirect_uris": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "redirect_uris"
+        ],
+        "title": "ClientsRedirectUrisArgs",
+        "type": "object"
+      },
+      "name": "clients.redirect_uris.update"
+    },
+    {
+      "description": "Check whether a scope is bound to a client (default or optional).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for scope binding checks.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "scope"
+        ],
+        "title": "ClientsScopeBindingArgs",
+        "type": "object"
+      },
+      "name": "clients.scope.binding"
+    },
+    {
+      "description": "Ensure a scope is bound (ensure=true) or unbound (ensure=false) for a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for scope ensure operations.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dry_run": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "ensure": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "scope"
+        ],
+        "title": "ClientsScopeEnsureArgs",
+        "type": "object"
+      },
+      "name": "clients.scope.ensure"
+    },
+    {
+      "description": "List client scope mappings for a client and role container.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.scope_mappings.client`.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopeMappingsClientArgs",
+        "type": "object"
+      },
+      "name": "clients.scope_mappings.client"
+    },
+    {
+      "description": "Add client role scope mappings to a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.scope_mappings.client.add` and `.delete`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopeMappingsClientModifyArgs",
+        "type": "object"
+      },
+      "name": "clients.scope_mappings.client.add"
+    },
+    {
+      "description": "Remove client role scope mappings from a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.scope_mappings.client.add` and `.delete`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopeMappingsClientModifyArgs",
+        "type": "object"
+      },
+      "name": "clients.scope_mappings.client.delete"
+    },
+    {
+      "description": "List realm scope mappings for a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for client scope list operations on a client.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopesArgs",
+        "type": "object"
+      },
+      "name": "clients.scope_mappings.realm"
+    },
+    {
+      "description": "Add realm scope mappings to a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.scope_mappings.realm.add` and `.delete`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes realm role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopeMappingsRealmModifyArgs",
+        "type": "object"
+      },
+      "name": "clients.scope_mappings.realm.add"
+    },
+    {
+      "description": "Remove realm scope mappings from a client.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.scope_mappings.realm.add` and `.delete`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes realm role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsScopeMappingsRealmModifyArgs",
+        "type": "object"
+      },
+      "name": "clients.scope_mappings.realm.delete"
+    },
+    {
+      "description": "Search clients by ID or clientId.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.search`.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging raw tokens or secrets.\n\n# Caveats\n* `query` is matched case-insensitively using stable local ranking.",
+        "properties": {
+          "limit": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "query"
+        ],
+        "title": "ClientsSearchArgs",
+        "type": "object"
+      },
+      "name": "clients.search"
+    },
+    {
+      "description": "Fetch the client secret.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.secrets.get`.\nRequired scopes: `keycloak-admin:clients:write` and `keycloak-admin:clients:secrets` (configurable); safety: exposes client secrets.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsSecretArgs",
+        "type": "object"
+      },
+      "name": "clients.secrets.get"
+    },
+    {
+      "description": "Generate a new client secret (confirm=true).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.secrets.rotate`.\nRequired scopes: `keycloak-admin:clients:write` and `keycloak-admin:clients:secrets` (configurable); safety: rotates secrets.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm"
+        ],
+        "title": "ClientsSecretRotateArgs",
+        "type": "object"
+      },
+      "name": "clients.secrets.rotate"
+    },
+    {
+      "description": "List role mappings for a client service account.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.service_account.roles`.\nRequired scopes: `keycloak-admin:clients:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsServiceAccountArgs",
+        "type": "object"
+      },
+      "name": "clients.service_account.roles"
+    },
+    {
+      "description": "Add client roles to a client service account.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for service-account client role mutations.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsServiceAccountClientArgs",
+        "type": "object"
+      },
+      "name": "clients.service_account.roles.client.add"
+    },
+    {
+      "description": "Remove client roles from a client service account.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for service-account client role mutations.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsServiceAccountClientArgs",
+        "type": "object"
+      },
+      "name": "clients.service_account.roles.client.remove"
+    },
+    {
+      "description": "Add realm roles to a client service account.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for service-account realm role mutations.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes realm role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsServiceAccountRealmArgs",
+        "type": "object"
+      },
+      "name": "clients.service_account.roles.realm.add"
+    },
+    {
+      "description": "Remove realm roles from a client service account.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for service-account realm role mutations.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes realm role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsServiceAccountRealmArgs",
+        "type": "object"
+      },
+      "name": "clients.service_account.roles.realm.remove"
+    },
+    {
+      "description": "Update client fields.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `clients.update`.\nRequired scopes: `keycloak-admin:clients:write` (configurable); safety: writes client configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "bearer_only": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "consent_required": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "description": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "direct_access_grants_enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "public_client": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "service_accounts_enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "standard_flow_enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "ClientsUpdateArgs",
+        "type": "object"
+      },
+      "name": "clients.update"
+    },
+    {
+      "description": "Clear user events in a realm (confirm=true).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `events.clear` and `admin_events.clear`.\nRequired scopes: `keycloak-admin:events:admin` (configurable); safety: destructive (clears event records).\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "confirm": {
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "confirm"
+        ],
+        "title": "EventsClearArgs",
+        "type": "object"
+      },
+      "name": "events.clear"
+    },
+    {
+      "description": "List user events in a realm.",
+      "inputSchema": {
+        "$defs": {
+          "EventTypeArg": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "Event type filter for `events.list`.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None."
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `events.list`.\nRequired scopes: `keycloak-admin:events:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dateFrom": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "dateTo": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "first": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "ipAddress": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EventTypeArg"
+              },
+              {
+                "const": null,
+                "nullable": true
+              }
+            ]
+          },
+          "user": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "EventsListArgs",
+        "type": "object"
+      },
+      "name": "events.list"
+    },
+    {
+      "description": "Create a group in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.create`.\nRequired scopes: `keycloak-admin:groups:write` (configurable); safety: writes group data.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "GroupsCreateArgs",
+        "type": "object"
+      },
+      "name": "groups.create"
+    },
+    {
+      "description": "Delete a group by id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.delete`.\nRequired scopes: `keycloak-admin:groups:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupsDeleteArgs",
+        "type": "object"
+      },
+      "name": "groups.delete"
+    },
+    {
+      "description": "Get a group by id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.get` and other group read tools.\nRequired scopes: `keycloak-admin:groups:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupsGetArgs",
+        "type": "object"
+      },
+      "name": "groups.get"
+    },
+    {
+      "description": "List groups within a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.list`.\nRequired scopes: `keycloak-admin:groups:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "search": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "GroupsListArgs",
+        "type": "object"
+      },
+      "name": "groups.list"
+    },
+    {
+      "description": "List members of a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.members.list`.\nRequired scopes: `keycloak-admin:groups:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "brief_representation": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "first": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupsMembersListArgs",
+        "type": "object"
+      },
+      "name": "groups.members.list"
+    },
+    {
+      "description": "Add client roles to a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.roles.client.add` and `groups.roles.client.remove`.\nRequired scopes: `keycloak-admin:groups:write` (configurable); safety: writes client role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupRolesClientModifyArgs",
+        "type": "object"
+      },
+      "name": "groups.roles.client.add"
+    },
+    {
+      "description": "Remove client roles from a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.roles.client.add` and `groups.roles.client.remove`.\nRequired scopes: `keycloak-admin:groups:write` (configurable); safety: writes client role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupRolesClientModifyArgs",
+        "type": "object"
+      },
+      "name": "groups.roles.client.remove"
+    },
+    {
+      "description": "List client role mappings for a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.roles.clients`.\nRequired scopes: `keycloak-admin:groups:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "client_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "client_unique_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupRolesClientArgs",
+        "type": "object"
+      },
+      "name": "groups.roles.clients"
+    },
+    {
+      "description": "List realm role mappings for a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.get` and other group read tools.\nRequired scopes: `keycloak-admin:groups:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupsGetArgs",
+        "type": "object"
+      },
+      "name": "groups.roles.realm"
+    },
+    {
+      "description": "Add realm roles to a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.roles.realm.add` and `groups.roles.realm.remove`.\nRequired scopes: `keycloak-admin:groups:write` (configurable); safety: writes realm role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupRolesRealmArgs",
+        "type": "object"
+      },
+      "name": "groups.roles.realm.add"
+    },
+    {
+      "description": "Remove realm roles from a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `groups.roles.realm.add` and `groups.roles.realm.remove`.\nRequired scopes: `keycloak-admin:groups:write` (configurable); safety: writes realm role mappings.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "group_id"
+        ],
+        "title": "GroupRolesRealmArgs",
+        "type": "object"
+      },
+      "name": "groups.roles.realm.remove"
+    },
+    {
+      "description": "Create an identity provider in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.create`.\nRequired scopes: `keycloak-admin:idp:write` (configurable); safety: writes identity provider configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "config": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": null,
+            "nullable": true,
+            "type": "object"
+          },
+          "display_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "provider_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "alias",
+          "provider_id"
+        ],
+        "title": "IdentityProviderCreateArgs",
+        "type": "object"
+      },
+      "name": "idp.create"
+    },
+    {
+      "description": "Delete an identity provider by alias.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.delete`.\nRequired scopes: `keycloak-admin:idp:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "alias"
+        ],
+        "title": "IdentityProviderDeleteArgs",
+        "type": "object"
+      },
+      "name": "idp.delete"
+    },
+    {
+      "description": "Fetch an identity provider by alias.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.get`.\nRequired scopes: `keycloak-admin:idp:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "alias"
+        ],
+        "title": "IdentityProviderGetArgs",
+        "type": "object"
+      },
+      "name": "idp.get"
+    },
+    {
+      "description": "List identity providers in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.list`.\nRequired scopes: `keycloak-admin:idp:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "IdentityProvidersListArgs",
+        "type": "object"
+      },
+      "name": "idp.list"
+    },
+    {
+      "description": "Add a mapper to an identity provider.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.mappers.add`.\nRequired scopes: `keycloak-admin:idp:write` (configurable); safety: writes mapper configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "config": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": null,
+            "nullable": true,
+            "type": "object"
+          },
+          "identity_provider_mapper": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "alias",
+          "name",
+          "identity_provider_mapper"
+        ],
+        "title": "IdentityProviderMapperCreateArgs",
+        "type": "object"
+      },
+      "name": "idp.mappers.add"
+    },
+    {
+      "description": "Delete a mapper by id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.mappers.delete`.\nRequired scopes: `keycloak-admin:idp:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "mapper_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "alias",
+          "mapper_id"
+        ],
+        "title": "IdentityProviderMapperDeleteArgs",
+        "type": "object"
+      },
+      "name": "idp.mappers.delete"
+    },
+    {
+      "description": "List identity provider mappers by alias.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `idp.mappers.list`.\nRequired scopes: `keycloak-admin:idp:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "alias"
+        ],
+        "title": "IdentityProviderMappersListArgs",
+        "type": "object"
+      },
+      "name": "idp.mappers.list"
+    },
+    {
+      "description": "Get in-memory metrics snapshot.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "metrics.get"
+    },
+    {
+      "description": "List authentication flows for a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for realm-scoped tools.\nRequired scopes vary by tool (`realm:read`, `realm:write`, or `realm:admin`); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "RealmArgs",
+        "type": "object"
+      },
+      "name": "realm.authentication_flows.list"
+    },
+    {
+      "description": "Add a client scope to a realm's default or optional scopes.",
+      "inputSchema": {
+        "$defs": {
+          "DefaultScopeKind": {
+            "description": "Client scope category for realm default scopes.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+            "enum": [
+              "default",
+              "optional"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `realm.default_scopes.add`.\nRequired scopes: `keycloak-admin:realm:admin` (configurable); safety: destructive.\n\nNotes:\n- Keycloak models \"realm default scopes\" as a list of client scope IDs. Callers can provide\n  either an explicit `scope_id` or a `scope_name` to resolve.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "kind": {
+            "$ref": "#/$defs/DefaultScopeKind"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "scope_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "kind"
+        ],
+        "title": "RealmDefaultScopesAddArgs",
+        "type": "object"
+      },
+      "name": "realm.default_scopes.add"
+    },
+    {
+      "description": "List realm default client scopes (default or optional).",
+      "inputSchema": {
+        "$defs": {
+          "DefaultScopeKind": {
+            "description": "Client scope category for realm default scopes.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+            "enum": [
+              "default",
+              "optional"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `realm.default_scopes.list`.\nRequired scopes: `keycloak-admin:realm:admin` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "kind": {
+            "$ref": "#/$defs/DefaultScopeKind"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "kind"
+        ],
+        "title": "RealmDefaultScopesListArgs",
+        "type": "object"
+      },
+      "name": "realm.default_scopes.list"
+    },
+    {
+      "description": "Remove a client scope from a realm's default or optional scopes.",
+      "inputSchema": {
+        "$defs": {
+          "DefaultScopeKind": {
+            "description": "Client scope category for realm default scopes.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+            "enum": [
+              "default",
+              "optional"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `realm.default_scopes.remove`.\nRequired scopes: `keycloak-admin:realm:admin` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "kind": {
+            "$ref": "#/$defs/DefaultScopeKind"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "scope_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "kind",
+          "scope_id"
+        ],
+        "title": "RealmDefaultScopesRemoveArgs",
+        "type": "object"
+      },
+      "name": "realm.default_scopes.remove"
+    },
+    {
+      "description": "Get realm events config.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for realm-scoped tools.\nRequired scopes vary by tool (`realm:read`, `realm:write`, or `realm:admin`); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "RealmArgs",
+        "type": "object"
+      },
+      "name": "realm.events.config.get"
+    },
+    {
+      "description": "Update realm events config.",
+      "inputSchema": {
+        "$defs": {
+          "RealmEventsConfig": {
+            "description": "Payload for `realm.events.config.set`.\nRequired scopes: `keycloak-admin:realm:write` (configurable); safety: writes realm event configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+            "properties": {
+              "adminEventsDetailsEnabled": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "adminEventsEnabled": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "enabledEventTypes": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "eventsEnabled": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "eventsExpiration": {
+                "format": "int64",
+                "nullable": true,
+                "type": "integer"
+              },
+              "eventsListeners": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `realm.events.config.set`.\nRequired scopes: `keycloak-admin:realm:write` (configurable); safety: writes realm event configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "config": {
+            "$ref": "#/$defs/RealmEventsConfig"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "config"
+        ],
+        "title": "RealmEventsConfigArgs",
+        "type": "object"
+      },
+      "name": "realm.events.config.set"
+    },
+    {
+      "description": "List active realm keys metadata.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for realm-scoped tools.\nRequired scopes vary by tool (`realm:read`, `realm:write`, or `realm:admin`); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "RealmArgs",
+        "type": "object"
+      },
+      "name": "realm.keys.list"
+    },
+    {
+      "description": "Test SMTP settings for a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `realm.smtp.test`.\nRequired scopes: `keycloak-admin:realm:write` (configurable); safety: initiates SMTP connectivity checks.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "settings": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "realm",
+          "settings"
+        ],
+        "title": "RealmSmtpTestArgs",
+        "type": "object"
+      },
+      "name": "realm.smtp.test"
+    },
+    {
+      "description": "List all realms.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "realms.list"
+    },
+    {
+      "description": "Add composite roles to a realm role.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.composites.add` and `roles.composites.remove`.\nRequired scopes: `keycloak-admin:roles:write` (configurable); safety: writes role composites.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesCompositeArgs",
+        "type": "object"
+      },
+      "name": "roles.composites.add"
+    },
+    {
+      "description": "Remove composite roles from a realm role.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.composites.add` and `roles.composites.remove`.\nRequired scopes: `keycloak-admin:roles:write` (configurable); safety: writes role composites.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "role_names": {
+            "default": null,
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesCompositeArgs",
+        "type": "object"
+      },
+      "name": "roles.composites.remove"
+    },
+    {
+      "description": "Create a new realm role.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.create`.\nRequired scopes: `keycloak-admin:roles:write` (configurable); safety: writes role data.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "composite": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "description": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesCreateArgs",
+        "type": "object"
+      },
+      "name": "roles.create"
+    },
+    {
+      "description": "Delete a realm role by name.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.delete`.\nRequired scopes: `keycloak-admin:roles:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesDeleteArgs",
+        "type": "object"
+      },
+      "name": "roles.delete"
+    },
+    {
+      "description": "Get a role by name.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.get` and `roles.list_composites`.\nRequired scopes: `keycloak-admin:roles:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesGetArgs",
+        "type": "object"
+      },
+      "name": "roles.get"
+    },
+    {
+      "description": "List realm roles.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.list`.\nRequired scopes: `keycloak-admin:roles:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "search": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "RolesListArgs",
+        "type": "object"
+      },
+      "name": "roles.list"
+    },
+    {
+      "description": "List composite roles for a realm role.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.get` and `roles.list_composites`.\nRequired scopes: `keycloak-admin:roles:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesGetArgs",
+        "type": "object"
+      },
+      "name": "roles.list_composites"
+    },
+    {
+      "description": "List users assigned to a realm role.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `roles.list_users`.\nRequired scopes: `keycloak-admin:roles:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "brief_representation": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "first": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "name"
+        ],
+        "title": "RolesListUsersArgs",
+        "type": "object"
+      },
+      "name": "roles.list_users"
+    },
+    {
+      "description": "Get server status and config summary.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "status.get"
+    },
+    {
+      "description": "List consents granted by a user.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments shared by user lookup tools.\nRequired scopes: `keycloak-admin:users:read` for read tools and `keycloak-admin:users:write` for `users.sessions.logout` (configurable); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGetArgs",
+        "type": "object"
+      },
+      "name": "users.consent.list"
+    },
+    {
+      "description": "Create a user in a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.create`.\nRequired scopes: `keycloak-admin:users:write` (configurable); safety: writes user data.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "email": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "enabled": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "first_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "last_name": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "username"
+        ],
+        "title": "UsersCreateArgs",
+        "type": "object"
+      },
+      "name": "users.create"
+    },
+    {
+      "description": "Delete a user by id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.delete`.\nRequired scopes: `keycloak-admin:users:write` (configurable); safety: destructive.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersDeleteArgs",
+        "type": "object"
+      },
+      "name": "users.delete"
+    },
+    {
+      "description": "Get a user by id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments shared by user lookup tools.\nRequired scopes: `keycloak-admin:users:read` for read tools and `keycloak-admin:users:write` for `users.sessions.logout` (configurable); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGetArgs",
+        "type": "object"
+      },
+      "name": "users.get"
+    },
+    {
+      "description": "Add a user to a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.groups.add` and `users.groups.remove`.\nRequired scopes: `keycloak-admin:users:write` (configurable); safety: writes group membership (removal currently lacks scope enforcement in handler).\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id",
+          "group_id"
+        ],
+        "title": "UsersGroupModifyArgs",
+        "type": "object"
+      },
+      "name": "users.groups.add"
+    },
+    {
+      "description": "List group membership for a user.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.groups.list`.\nRequired scopes: `keycloak-admin:users:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "brief_representation": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGroupsListArgs",
+        "type": "object"
+      },
+      "name": "users.groups.list"
+    },
+    {
+      "description": "Remove a user from a group.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.groups.add` and `users.groups.remove`.\nRequired scopes: `keycloak-admin:users:write` (configurable); safety: writes group membership (removal currently lacks scope enforcement in handler).\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id",
+          "group_id"
+        ],
+        "title": "UsersGroupModifyArgs",
+        "type": "object"
+      },
+      "name": "users.groups.remove"
+    },
+    {
+      "description": "List users within a realm.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.list`.\nRequired scopes: `keycloak-admin:users:read` (configurable); safety: read-only.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "max": {
+            "default": null,
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "search": {
+            "default": null,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "title": "UsersListArgs",
+        "type": "object"
+      },
+      "name": "users.list"
+    },
+    {
+      "description": "Replace the required actions list for a user.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.required_actions.set`.\nRequired scopes: `keycloak-admin:users:write` (configurable); safety: writes account state.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "actions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id",
+          "actions"
+        ],
+        "title": "UsersRequiredActionsArgs",
+        "type": "object"
+      },
+      "name": "users.required_actions.set"
+    },
+    {
+      "description": "Reset a user password (temporary by default).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments for `users.reset_password`.\nRequired scopes: `keycloak-admin:users:write` (configurable); safety: writes credentials.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "new_password": {
+            "type": "string"
+          },
+          "realm": {
+            "type": "string"
+          },
+          "temporary": {
+            "default": null,
+            "nullable": true,
+            "type": "boolean"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id",
+          "new_password"
+        ],
+        "title": "UsersResetPasswordArgs",
+        "type": "object"
+      },
+      "name": "users.reset_password"
+    },
+    {
+      "description": "List client role mappings for a user.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments shared by user lookup tools.\nRequired scopes: `keycloak-admin:users:read` for read tools and `keycloak-admin:users:write` for `users.sessions.logout` (configurable); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGetArgs",
+        "type": "object"
+      },
+      "name": "users.role_mappings.clients"
+    },
+    {
+      "description": "List realm role mappings for a user.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments shared by user lookup tools.\nRequired scopes: `keycloak-admin:users:read` for read tools and `keycloak-admin:users:write` for `users.sessions.logout` (configurable); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGetArgs",
+        "type": "object"
+      },
+      "name": "users.role_mappings.realm"
+    },
+    {
+      "description": "List active sessions.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments shared by user lookup tools.\nRequired scopes: `keycloak-admin:users:read` for read tools and `keycloak-admin:users:write` for `users.sessions.logout` (configurable); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGetArgs",
+        "type": "object"
+      },
+      "name": "users.sessions.list"
+    },
+    {
+      "description": "Logout a user from all sessions.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Arguments shared by user lookup tools.\nRequired scopes: `keycloak-admin:users:read` for read tools and `keycloak-admin:users:write` for `users.sessions.logout` (configurable); safety varies by tool.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
+        "properties": {
+          "realm": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm",
+          "user_id"
+        ],
+        "title": "UsersGetArgs",
+        "type": "object"
+      },
+      "name": "users.sessions.logout"
+    }
+  ],
+  "version": 1
+}

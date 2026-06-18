@@ -1,0 +1,11 @@
+[workspace]
+members = ["kc-admin-gateway", "kc-admin-mcp"]
+resolver = "2"
+
+[workspace.dependencies]
+mcp-toolkit-auth = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "909abe9c470900bcb1e3ec055dd8734634250855" }
+mcp-toolkit-core = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "909abe9c470900bcb1e3ec055dd8734634250855" }
+mcp-toolkit-http = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "909abe9c470900bcb1e3ec055dd8734634250855" }
+mcp-toolkit-observability = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "909abe9c470900bcb1e3ec055dd8734634250855" }
+mcp-toolkit-policy-core = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "909abe9c470900bcb1e3ec055dd8734634250855" }
+mcp-toolkit-testing = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "909abe9c470900bcb1e3ec055dd8734634250855" }
