@@ -31,65 +31,87 @@
         "properties": {
           "authClient": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "authIpAddress": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "authRealm": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "authUser": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dateFrom": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dateTo": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "first": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "max": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "operationTypes": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "resourcePath": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "resourceTypes": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -118,8 +140,10 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           }
         },
         "title": "AuditListArgs",
@@ -137,15 +161,19 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "expiration": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -207,8 +235,10 @@
         "properties": {
           "allow_default_scopes": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "allowed_scopes": {
             "default": [],
@@ -219,13 +249,17 @@
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "provider_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -247,18 +281,24 @@
         "properties": {
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "provider_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -298,8 +338,10 @@
         "properties": {
           "allow_default_scopes": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "allowed_scopes": {
             "default": [],
@@ -310,18 +352,24 @@
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "provider_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -343,16 +391,20 @@
         "properties": {
           "description": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "type": "string"
           },
           "protocol": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -375,13 +427,17 @@
         "properties": {
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -403,13 +459,17 @@
         "properties": {
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -452,8 +512,10 @@
               "type": "string"
             },
             "default": null,
-            "nullable": true,
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           },
           "mapper_name": {
             "type": "string"
@@ -469,13 +531,17 @@
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -503,13 +569,17 @@
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -529,21 +599,27 @@
         "properties": {
           "include_config": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -565,13 +641,17 @@
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -596,18 +676,24 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -632,18 +718,24 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -663,58 +755,80 @@
             "properties": {
               "bearer_only": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "client_id": {
                 "default": null,
-                "nullable": true,
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "consent_required": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "description": {
                 "default": null,
-                "nullable": true,
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "direct_access_grants_enabled": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "enabled": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "id": {
                 "default": null,
-                "nullable": true,
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "name": {
                 "default": null,
-                "nullable": true,
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "public_client": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "service_accounts_enabled": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "standard_flow_enabled": {
                 "default": null,
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               }
             },
             "type": "object"
@@ -728,8 +842,10 @@
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -762,31 +878,41 @@
           },
           "enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "protocol": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "public_client": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "service_accounts_enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         },
         "required": [
@@ -806,13 +932,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -834,47 +964,61 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -893,47 +1037,61 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -952,55 +1110,71 @@
         "properties": {
           "allow_empty": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "confirm": {
             "type": "boolean"
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1020,13 +1194,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1048,13 +1226,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1076,13 +1258,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1104,13 +1290,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1138,8 +1328,10 @@
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1165,16 +1357,20 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "search": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1193,13 +1389,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1221,47 +1421,61 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1280,47 +1494,61 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1339,55 +1567,71 @@
         "properties": {
           "allow_empty": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "confirm": {
             "type": "boolean"
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1407,31 +1651,41 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "config": {
             "additionalProperties": {
               "type": "string"
             },
             "default": null,
-            "nullable": true,
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           },
           "consent_required": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "consent_text": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "type": "string"
@@ -1465,13 +1719,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "mapper_id": {
             "type": "string"
@@ -1497,18 +1755,24 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "include_config": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1544,63 +1808,78 @@
                 "$ref": "#/$defs/ClientsPruneAction"
               },
               {
-                "const": null,
-                "nullable": true
+                "type": "null"
               }
             ]
           },
           "client_id_pattern": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "client_id_prefix": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "confirm": {
             "type": "boolean"
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "exclude_client_ids": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           },
           "limit": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "max": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "search": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1620,13 +1899,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1655,13 +1938,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1687,23 +1974,31 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dry_run": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "ensure": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1729,26 +2024,34 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "role_client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1767,34 +2070,44 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "role_client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1813,34 +2126,44 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "role_client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1859,13 +2182,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1887,13 +2214,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1903,8 +2234,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1923,13 +2256,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -1939,8 +2276,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -1961,8 +2300,10 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "query": {
             "type": "string"
@@ -1988,13 +2329,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2016,16 +2361,20 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "confirm": {
             "type": "boolean"
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2048,13 +2397,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2076,34 +2429,44 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "role_client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2122,34 +2485,44 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "role_client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "role_names": {
             "default": null,
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2168,13 +2541,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2184,8 +2561,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2204,13 +2583,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2220,8 +2603,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2240,61 +2625,83 @@
         "properties": {
           "bearer_only": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "consent_required": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "description": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "direct_access_grants_enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "public_client": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "service_accounts_enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "standard_flow_enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2351,37 +2758,49 @@
         "properties": {
           "client": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dateFrom": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "dateTo": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "first": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "ipAddress": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "max": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2392,15 +2811,16 @@
                 "$ref": "#/$defs/EventTypeArg"
               },
               {
-                "const": null,
-                "nullable": true
+                "type": "null"
               }
             ]
           },
           "user": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2422,8 +2842,10 @@
           },
           "parent_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2493,8 +2915,10 @@
           },
           "search": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2513,15 +2937,19 @@
         "properties": {
           "brief_representation": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "first": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "group_id": {
             "type": "string"
@@ -2530,8 +2958,10 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -2554,13 +2984,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "group_id": {
             "type": "string"
@@ -2573,8 +3007,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2594,13 +3030,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "group_id": {
             "type": "string"
@@ -2613,8 +3053,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2634,13 +3076,17 @@
         "properties": {
           "client_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "client_unique_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "group_id": {
             "type": "string"
@@ -2697,8 +3143,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2727,8 +3175,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -2754,18 +3204,24 @@
               "type": "string"
             },
             "default": null,
-            "nullable": true,
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           },
           "display_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "provider_id": {
             "type": "string"
@@ -2860,8 +3316,10 @@
               "type": "string"
             },
             "default": null,
-            "nullable": true,
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           },
           "identity_provider_mapper": {
             "type": "string"
@@ -2982,13 +3440,17 @@
           },
           "scope_id": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "scope_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -3094,35 +3556,47 @@
             "description": "Payload for `realm.events.config.set`.\nRequired scopes: `keycloak-admin:realm:write` (configurable); safety: writes realm event configuration.\n\n# Errors\n* This type does not emit errors directly.\n\n# Security\n* Treat all inputs as untrusted; avoid logging secrets or raw tokens.\n\n# Caveats\n* None.",
             "properties": {
               "adminEventsDetailsEnabled": {
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "adminEventsEnabled": {
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "enabledEventTypes": {
                 "items": {
                   "type": "string"
                 },
-                "nullable": true,
-                "type": "array"
+                "type": [
+                  "array",
+                  "null"
+                ]
               },
               "eventsEnabled": {
-                "nullable": true,
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
               "eventsExpiration": {
                 "format": "int64",
-                "nullable": true,
-                "type": "integer"
+                "type": [
+                  "integer",
+                  "null"
+                ]
               },
               "eventsListeners": {
                 "items": {
                   "type": "string"
                 },
-                "nullable": true,
-                "type": "array"
+                "type": [
+                  "array",
+                  "null"
+                ]
               }
             },
             "type": "object"
@@ -3213,8 +3687,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -3243,8 +3719,10 @@
             "items": {
               "type": "string"
             },
-            "nullable": true,
-            "type": "array"
+            "type": [
+              "array",
+              "null"
+            ]
           }
         },
         "required": [
@@ -3264,13 +3742,17 @@
         "properties": {
           "composite": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "description": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "name": {
             "type": "string"
@@ -3342,16 +3824,20 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "search": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -3392,22 +3878,28 @@
         "properties": {
           "brief_representation": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "first": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "max": {
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "name": {
             "type": "string"
@@ -3463,23 +3955,31 @@
         "properties": {
           "email": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "enabled": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "first_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "last_name": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -3575,8 +4075,10 @@
         "properties": {
           "brief_representation": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
@@ -3630,16 +4132,20 @@
             "default": null,
             "format": "uint32",
             "minimum": 0,
-            "nullable": true,
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "realm": {
             "type": "string"
           },
           "search": {
             "default": null,
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -3693,8 +4199,10 @@
           },
           "temporary": {
             "default": null,
-            "nullable": true,
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "user_id": {
             "type": "string"
