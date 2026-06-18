@@ -146,19 +146,19 @@ impl KcAdminMcp {
 impl ServerHandler for KcAdminMcp {
     /// Return server metadata, versioning, and capabilities.
     fn get_info(&self) -> ServerInfo {
-        ServerInfo {
-            protocol_version: ProtocolVersion::V_2024_11_05,
-            capabilities: ServerCapabilities::builder()
+        ServerInfo::new(
+            ServerCapabilities::builder()
                 .enable_tools()
                 .enable_resources()
                 .enable_tool_list_changed()
                 .build(),
-            server_info: Implementation::from_build_env(),
-            instructions: Some(
-                "Keycloak admin MCP server (Rust). Auth enforced; tools delegate to kc-admin-gateway.".to_string(),
-            ),
-            ..Default::default()
-        }
+        )
+        .with_protocol_version(ProtocolVersion::V_2024_11_05)
+        .with_server_info(Implementation::from_build_env())
+        .with_instructions(
+            "Keycloak admin MCP server (Rust). Auth enforced; tools delegate to kc-admin-gateway."
+                .to_string(),
+        )
     }
 
     /// List all registered tools from the tool router.
@@ -391,10 +391,7 @@ impl ServerHandler for KcAdminMcp {
             text,
             meta: None,
         };
-        std::future::ready(Ok(ReadResourceResult {
-            contents: vec![contents],
-            ..Default::default()
-        }))
+        std::future::ready(Ok(ReadResourceResult::new(vec![contents])))
     }
 }
 
