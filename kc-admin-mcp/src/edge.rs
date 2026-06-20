@@ -12,9 +12,10 @@
 //! * **Path Confusion Rejection**: Blocks dot-segment and encoded-separator path confusion vectors.
 
 use axum::body::Body;
-use axum::http::{header::AUTHORIZATION, HeaderMap, Request, StatusCode};
+use axum::http::{HeaderMap, Request, StatusCode};
 use axum::middleware::Next;
 use axum::response::Response;
+use mcp_toolkit_auth::{parse_strict_bearer_authorization, BearerParseError};
 
 /// Edge hardening middleware.
 ///
@@ -38,40 +39,10 @@ pub async fn edge_guard(req: Request<Body>, next: Next) -> Result<Response, Stat
 }
 
 fn ensure_strict_bearer(headers: &HeaderMap) -> Result<(), &'static str> {
-    let mut values = headers.get_all(AUTHORIZATION).iter();
-    let Some(value) = values.next() else {
-        return Ok(());
-    };
-    if values.next().is_some() {
-        return Err("multiple authorization headers");
+    match parse_strict_bearer_authorization(headers) {
+        Ok(_) | Err(BearerParseError::MissingAuthorization) => Ok(()),
+        Err(_) => Err("invalid authorization header"),
     }
-
-    let raw = value.to_str().map_err(|_| "invalid authorization header")?;
-
-    if raw.trim() != raw {
-        return Err("authorization header has leading/trailing whitespace");
-    }
-
-    if raw.chars().any(|ch| ch.is_control()) {
-        return Err("authorization header contains control characters");
-    }
-
-    if raw.matches(' ').count() != 1 {
-        return Err("authorization header must contain a single space separator");
-    }
-
-    let (scheme, token) = raw
-        .split_once(' ')
-        .ok_or("authorization header missing space")?;
-    if !scheme.eq_ignore_ascii_case("bearer") {
-        return Err("authorization scheme must be Bearer");
-    }
-
-    if token.is_empty() {
-        return Err("empty bearer token");
-    }
-
-    Ok(())
 }
 
 fn contains_matrix_params(path: &str) -> bool {

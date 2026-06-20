@@ -13,12 +13,11 @@
 //! * **Path Confusion Rejection**: Blocks dot-segment and encoded-separator path confusion vectors.
 
 use axum::body::Body;
-use axum::http::{header::AUTHORIZATION, HeaderMap, Request, StatusCode};
+use axum::http::{HeaderMap, Request, StatusCode};
 use axum::middleware::Next;
 use axum::response::Response;
+use mcp_toolkit_auth::{parse_strict_bearer_authorization, BearerParseError};
 use mcp_toolkit_policy_core::{contains_matrix_params, contains_path_confusion};
-
-use crate::auth::validate_bearer_header;
 
 /// Edge guard middleware for the gateway.
 ///
@@ -42,17 +41,10 @@ pub async fn edge_guard(req: Request<Body>, next: Next) -> Result<Response, Stat
 }
 
 fn ensure_strict_bearer(headers: &HeaderMap) -> Result<(), &'static str> {
-    let mut values = headers.get_all(AUTHORIZATION).iter();
-    let Some(value) = values.next() else {
-        return Ok(());
-    };
-    if values.next().is_some() {
-        return Err("multiple authorization headers");
+    match parse_strict_bearer_authorization(headers) {
+        Ok(_) | Err(BearerParseError::MissingAuthorization) => Ok(()),
+        Err(_) => Err("invalid authorization header"),
     }
-
-    let raw = value.to_str().map_err(|_| "invalid authorization header")?;
-    validate_bearer_header(raw).map_err(|_| "invalid authorization header")?;
-    Ok(())
 }
 
 #[cfg(test)]

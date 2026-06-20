@@ -1209,7 +1209,7 @@ checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
 [[package]]
 name = "mcp-toolkit-auth"
 version = "0.1.0"
-source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=909abe9c470900bcb1e3ec055dd8734634250855#909abe9c470900bcb1e3ec055dd8734634250855"
+source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=76aa657e229d51462d98297bc658b66df1b8a191#76aa657e229d51462d98297bc658b66df1b8a191"
 dependencies = [
  "axum",
  "base64",
@@ -1233,7 +1233,7 @@ dependencies = [
 [[package]]
 name = "mcp-toolkit-core"
 version = "0.1.0"
-source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=909abe9c470900bcb1e3ec055dd8734634250855#909abe9c470900bcb1e3ec055dd8734634250855"
+source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=76aa657e229d51462d98297bc658b66df1b8a191#76aa657e229d51462d98297bc658b66df1b8a191"
 dependencies = [
  "rmcp",
  "serde",
@@ -1243,7 +1243,7 @@ dependencies = [
 [[package]]
 name = "mcp-toolkit-http"
 version = "0.1.0"
-source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=909abe9c470900bcb1e3ec055dd8734634250855#909abe9c470900bcb1e3ec055dd8734634250855"
+source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=76aa657e229d51462d98297bc658b66df1b8a191#76aa657e229d51462d98297bc658b66df1b8a191"
 dependencies = [
  "aes-gcm",
  "axum",
@@ -1264,7 +1264,7 @@ dependencies = [
 [[package]]
 name = "mcp-toolkit-observability"
 version = "0.1.0"
-source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=909abe9c470900bcb1e3ec055dd8734634250855#909abe9c470900bcb1e3ec055dd8734634250855"
+source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=76aa657e229d51462d98297bc658b66df1b8a191#76aa657e229d51462d98297bc658b66df1b8a191"
 dependencies = [
  "once_cell",
  "regex",
@@ -1277,7 +1277,7 @@ dependencies = [
 [[package]]
 name = "mcp-toolkit-policy-core"
 version = "0.1.0"
-source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=909abe9c470900bcb1e3ec055dd8734634250855#909abe9c470900bcb1e3ec055dd8734634250855"
+source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=76aa657e229d51462d98297bc658b66df1b8a191#76aa657e229d51462d98297bc658b66df1b8a191"
 dependencies = [
  "regex",
  "serde",
@@ -1287,7 +1287,7 @@ dependencies = [
 [[package]]
 name = "mcp-toolkit-testing"
 version = "0.1.0"
-source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=909abe9c470900bcb1e3ec055dd8734634250855#909abe9c470900bcb1e3ec055dd8734634250855"
+source = "git+https://github.com/sednalabs/mcp-toolkit-rs?rev=76aa657e229d51462d98297bc658b66df1b8a191#76aa657e229d51462d98297bc658b66df1b8a191"
 dependencies = [
  "http",
  "mcp-toolkit-core",

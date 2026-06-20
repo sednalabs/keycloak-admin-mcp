@@ -22,11 +22,11 @@ use axum::extract::State;
 use axum::http::{header::AUTHORIZATION, HeaderMap, Method, Request, Response, StatusCode};
 use axum::response::IntoResponse;
 use axum::Json;
-use mcp_toolkit_auth::Authenticator;
+use mcp_toolkit_auth::{parse_strict_bearer_authorization, Authenticator};
 use serde_json::{json, Value};
 use uuid::Uuid;
 
-use crate::auth::{enforce_scopes, validate_bearer_header, AuditIdentity};
+use crate::auth::{enforce_scopes, AuditIdentity};
 use crate::config::GatewayConfig;
 use crate::errors::GatewayError;
 use crate::exchange::{exchange_token, extract_access_token};
@@ -702,16 +702,9 @@ fn extract_client(headers: &HeaderMap) -> String {
 
 /// Extract the bearer token from the request for introspection/exchange.
 fn extract_bearer_token(headers: &HeaderMap) -> Result<String, GatewayError> {
-    let value = headers
-        .get(AUTHORIZATION)
-        .ok_or(GatewayError::MissingToken)?;
-    let raw = value.to_str().map_err(|_| GatewayError::MissingToken)?;
-    validate_bearer_header(raw)?;
-    let (_, token) = raw.split_once(' ').ok_or(GatewayError::MissingToken)?;
-    if token.is_empty() {
-        return Err(GatewayError::MissingToken);
-    }
-    Ok(token.to_string())
+    parse_strict_bearer_authorization(headers)
+        .map(|token| token.as_str().to_string())
+        .map_err(|_| GatewayError::MissingToken)
 }
 
 /// Enforce issuer/audience claims against configured expectations.
