@@ -2,17 +2,9 @@ name: codeql-query-tests
 
 on:
   pull_request:
-    paths:
-      - ".github/codeql/**"
-      - ".github/workflows/codeql.yml"
-      - ".github/workflows/codeql-query-tests.yml"
   push:
     branches:
       - main
-    paths:
-      - ".github/codeql/**"
-      - ".github/workflows/codeql.yml"
-      - ".github/workflows/codeql-query-tests.yml"
   workflow_dispatch:
 
 permissions:
@@ -35,24 +27,74 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Detect query-related changes
+        id: changes
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          run_queries=false
+          case "$EVENT_NAME" in
+            workflow_dispatch)
+              run_queries=true
+              ;;
+            pull_request)
+              git fetch --no-tags --depth=1 origin "$PR_BASE_SHA"
+              if git diff --name-only "$PR_BASE_SHA" HEAD -- \
+                .github/codeql \
+                .github/workflows/codeql.yml \
+                .github/workflows/codeql-query-tests.yml | grep -q .; then
+                run_queries=true
+              fi
+              ;;
+            push)
+              if [[ -z "${PUSH_BEFORE_SHA:-}" || "$PUSH_BEFORE_SHA" =~ ^0+$ ]]; then
+                run_queries=true
+              else
+                git fetch --no-tags --depth=1 origin "$PUSH_BEFORE_SHA"
+                if git diff --name-only "$PUSH_BEFORE_SHA" HEAD -- \
+                  .github/codeql \
+                  .github/workflows/codeql.yml \
+                  .github/workflows/codeql-query-tests.yml | grep -q .; then
+                  run_queries=true
+                fi
+              fi
+              ;;
+          esac
+
+          echo "run_queries=$run_queries" >> "$GITHUB_OUTPUT"
+          if [[ "$run_queries" == "true" ]]; then
+            echo "Actions workflow security query files changed; compiling queries." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No Actions workflow security query files changed; skipping query compilation." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Set up CodeQL
         # github/codeql-action v4
         id: setup-codeql
+        if: steps.changes.outputs.run_queries == 'true'
         uses: github/codeql-action/setup-codeql@8aad20d150bbac5944a9f9d289da16a4b0d87c1e
 
       - name: Install query pack dependencies
+        if: steps.changes.outputs.run_queries == 'true'
         shell: bash
         run: |
           set -euo pipefail
           "${{ steps.setup-codeql.outputs.codeql-path }}" pack install .github/codeql/actions-workflow-security
 
       - name: Resolve Actions workflow security suite
+        if: steps.changes.outputs.run_queries == 'true'
         shell: bash
         run: |
           set -euo pipefail
           "${{ steps.setup-codeql.outputs.codeql-path }}" resolve queries             --search-path .github/codeql             .github/codeql/actions-workflow-security/suites/actions-workflow-security.qls
 
       - name: Compile Actions workflow security queries
+        if: steps.changes.outputs.run_queries == 'true'
         shell: bash
         run: |
           set -euo pipefail

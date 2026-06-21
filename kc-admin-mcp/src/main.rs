@@ -137,9 +137,6 @@ impl AppState {
         let service_started = started_at;
         let service_provenance = runtime_provenance.clone();
         let service_runtime_admission = runtime_admission.clone();
-        let mut stateful_http_config = StreamableHttpServerConfig::default();
-        stateful_http_config.sse_retry = sse_retry;
-        stateful_http_config.cancellation_token = cancellation_token.child_token();
         let stateful_service = StreamableHttpService::new(
             move || {
                 Ok(KcAdminMcp::new(
@@ -154,7 +151,9 @@ impl AppState {
                 ))
             },
             recording_session_manager.clone(),
-            stateful_http_config,
+            StreamableHttpServerConfig::default()
+                .with_sse_retry(sse_retry)
+                .with_cancellation_token(cancellation_token.child_token()),
         );
         let stateless_service = if config.streamable_http.stateless_fallback {
             let stateless_config = config.clone();
@@ -165,10 +164,6 @@ impl AppState {
             let stateless_started = started_at;
             let stateless_provenance = runtime_provenance.clone();
             let stateless_runtime_admission = runtime_admission.clone();
-            let mut stateless_http_config = StreamableHttpServerConfig::default();
-            stateless_http_config.sse_retry = None;
-            stateless_http_config.stateful_mode = false;
-            stateless_http_config.cancellation_token = cancellation_token.child_token();
             Some(StreamableHttpService::new(
                 move || {
                     Ok(KcAdminMcp::new(
@@ -183,7 +178,10 @@ impl AppState {
                     ))
                 },
                 recording_session_manager.clone(),
-                stateless_http_config,
+                StreamableHttpServerConfig::default()
+                    .with_sse_retry(None)
+                    .with_stateful_mode(false)
+                    .with_cancellation_token(cancellation_token.child_token()),
             ))
         } else {
             None
