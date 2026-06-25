@@ -58,6 +58,22 @@ Optional policy update smoke:
 - Use any MCP client to call `client_registration.policies.delete` with a token
   that includes `keycloak-admin:realm:write` and the write role.
 
+### Delegated token-exchange policy (future opt-in)
+
+The delegated-admin/token-exchange model is documented in
+`docs/delegated-admin-exchange-design.md`. Before enabling an enforced delegated
+mode, hosted validation should include:
+
+- Pure policy vectors for allowed exchange, scope escalation, audience mismatch,
+  unsupported `resource`, refresh-token request, unsupported actor chain, and
+  missing audit binding.
+- Gateway unit coverage proving route-derived scopes are the only requested
+  scopes sent to the exchange decision.
+- An opt-in authenticated Keycloak smoke for a confidential exchange client,
+  with one allowed read route and at least one denied exchange.
+- Log/audit assertions that denials include `request_id` and a stable reason
+  bucket without raw tokens or secrets.
+
 ### Optional mTLS (manual)
 
 If running gateway with TLS/mTLS, provide PEMs via env or systemd credentials and
