@@ -24,6 +24,11 @@ Required env vars:
 - `KC_GATEWAY_EXCHANGE_CLIENT_ID`
 - `KC_GATEWAY_EXCHANGE_CLIENT_SECRET`
 
+The delegated-admin/token-exchange decision boundary is documented in
+`docs/delegated-admin-exchange-design.md`. Current deployments should treat the
+gateway service-account model as the default and any delegated mode as opt-in
+until the policy vectors and authenticated smoke tests are green.
+
 Optional env vars:
 
 - `KC_GATEWAY_ALLOWED_AZP`, `KC_GATEWAY_EXPECTED_ISSUER`, `KC_GATEWAY_EXPECTED_AUDIENCE`
