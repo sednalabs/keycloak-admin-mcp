@@ -63,6 +63,16 @@ Production guardrails: when `KC_GATEWAY_BUILD_PRODUCTION=true`, startup requires
 `KC_GATEWAY_ALLOWED_AZP` (unless explicit break-glass `KC_GATEWAY_ALLOW_OPEN_AZP=true`
 with required reason and TTL).
 
+Audience note: `KC_GATEWAY_EXPECTED_AUDIENCE` protects the inbound gateway hop.
+It must be present in caller tokens independently of the MCP resource audience,
+unless your realm deliberately maps the same value to both surfaces.
+`KC_GATEWAY_EXCHANGE_AUDIENCE` is different: it is the optional RFC 8693
+audience requested for the exchanged downstream token. A request can pass MCP
+auth and still fail at the gateway if the caller token lacks the gateway
+audience, or fail during exchange if Keycloak does not allow the exchange
+client to request the downstream audience. Use the response `x-request-id` to
+correlate auth logs before changing realm mappings.
+
 ## Run locally
 
 ```bash
