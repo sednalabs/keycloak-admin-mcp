@@ -73,6 +73,42 @@ Gateway route surface:
 - `/admin`
 - `/admin/{*path}`
 
+### Gateway audience and token exchange
+
+Gateway-backed deployments have two audience checks that are easy to confuse:
+
+- `KC_GATEWAY_EXPECTED_AUDIENCE` is the inbound audience the caller token must
+  contain before the gateway will authorize the request.
+- `KC_GATEWAY_EXCHANGE_AUDIENCE` is the optional RFC 8693 `audience` value the
+  gateway asks Keycloak to issue for the exchanged downstream token.
+
+The MCP resource audience, such as `KC_ADMIN_MCP_AUDIENCE`, is not a
+substitute for the gateway audience unless your realm intentionally maps the
+same value into caller tokens. In the common gateway pattern, the caller token
+needs both the MCP resource audience for the MCP edge and a gateway audience for
+the gateway hop.
+
+Verify the configuration before rollout:
+
+1. Introspect or decode a non-secret copy of the caller token and confirm `iss`
+   matches `KC_GATEWAY_EXPECTED_ISSUER`.
+2. Confirm the token `aud` list contains `KC_GATEWAY_EXPECTED_AUDIENCE`.
+3. Confirm `azp` or `client_id` is included in `KC_GATEWAY_ALLOWED_AZP`.
+4. If `KC_GATEWAY_EXCHANGE_AUDIENCE` is set, confirm the exchange client is
+   permitted to request that audience in Keycloak.
+5. If `KC_GATEWAY_EXCHANGE_RESOURCE` is set, confirm it matches the downstream
+   resource indicator expected by the admin API path.
+
+Troubleshooting:
+
+- A gateway `403` before token exchange usually means issuer, audience, scopes,
+  roles, or `azp` did not pass the inbound gateway checks.
+- A token-exchange failure after the inbound checks usually means the exchange
+  client, requested audience, requested resource, or service-account roles are
+  not permitted for the RFC 8693 exchange.
+- Capture `x-request-id` from the response and search gateway auth logs for the
+  same request ID and auth reason bucket before changing realm settings.
+
 ## MCP configuration
 
 Required env vars:
