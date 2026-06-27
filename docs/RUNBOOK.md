@@ -77,7 +77,7 @@ Gateway-backed deployments have two audience checks that are easy to confuse:
 - `KC_GATEWAY_EXCHANGE_AUDIENCE` is the optional RFC 8693 `audience` value the
   gateway asks Keycloak to issue for the exchanged downstream token.
 
-The MCP resource audience, such as `KC_ADMIN_MCP_RESOURCE_URL`, is not a
+The MCP resource audience, such as `KC_ADMIN_MCP_AUDIENCE`, is not a
 substitute for the gateway audience unless your realm intentionally maps the
 same value into caller tokens. In the common gateway pattern, the caller token
 needs both the MCP resource audience for the MCP edge and a gateway audience for
