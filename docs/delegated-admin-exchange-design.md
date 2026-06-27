@@ -112,7 +112,10 @@ Inputs:
 - `actor_client_id` from `azp` or `client_id`
 - `audiences`
 - `token_scopes`
-- `token_expiry`
+- `subject_token_remaining_ttl_s`, precomputed at the parsing boundary so the
+  oracle does not read wall-clock time
+- `requested_ttl_s`, when the caller or gateway requests a bounded downstream
+  token lifetime
 - `proof_mode` (`bearer`, `dpop`, `mtls`, or `unknown`)
 - `admin_realm`
 - `http_method`
@@ -124,6 +127,9 @@ Inputs:
 - `requested_token_type`
 - `act_chain_present`
 - `may_act_present`
+- `policy_config`, containing allowlisted requester clients, allowed exchange
+  audiences/resources, realm policy, route policy, `max_ttl_s`, and
+  `require_requester_audience`
 
 Outputs:
 
@@ -146,7 +152,7 @@ cover the pure decision.
 | Condition | Decision | Reason |
 | --- | --- | --- |
 | Issuer mismatch | Deny | `issuer_mismatch` |
-| Gateway audience missing from subject token | Deny | `audience_mismatch` |
+| Gateway audience missing from subject token while `policy_config.require_requester_audience` is enabled | Deny | `audience_mismatch` |
 | `azp`/`client_id` not allowlisted | Deny | `requester_not_allowed` |
 | Sender-constrained subject token in standard exchange mode | Deny | `sender_constrained_subject_unsupported` |
 | `requested_resource` set while using Keycloak standard token exchange | Deny | `resource_parameter_unsupported` |
@@ -156,7 +162,7 @@ cover the pure decision.
 | Route family is not gateway allowlisted | Deny | `route_not_allowlisted` |
 | Realm is outside configured realm policy | Deny | `realm_not_allowed` |
 | `act` or `may_act` chain present before chain semantics are implemented | Deny | `actor_chain_unsupported` |
-| Exchange token TTL exceeds configured maximum | Deny | `token_ttl_too_long` |
+| Subject-token remaining TTL or requested exchange TTL exceeds `policy_config.max_ttl_s` | Deny | `token_ttl_too_long` |
 | Missing request_id or audit subject | Deny | `audit_binding_missing` |
 | All canonical checks pass | Allow | `allowed` |
 
