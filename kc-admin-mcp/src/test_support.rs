@@ -146,8 +146,8 @@ pub(crate) fn build_server(config: Config) -> KcAdminMcp {
     let gateway =
         GatewayClient::new(&config.gateway, Some(metrics.clone())).expect("gateway client");
     let tool_list_tracker = Arc::new(ToolListTracker::new());
-    let executable_path = std::env::current_exe().expect("resolve test executable path");
-    let runtime_provenance = Arc::new(capture_runtime_provenance(&executable_path));
+    let runtime_snapshot = capture_runtime_provenance().expect("capture runtime provenance");
+    let runtime_provenance = Arc::new(runtime_snapshot.provenance);
     let runtime_admission = RuntimeAdmissionExtension {
         enforcement_phase: "off".to_string(),
         required_gate_level: "fast".to_string(),

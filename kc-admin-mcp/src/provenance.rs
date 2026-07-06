@@ -15,13 +15,12 @@
 //! * `docs/provenance-test-gate-design.md`
 //! * `docs/RUNBOOK.md`
 
-use std::fs;
-use std::path::Path;
-use std::sync::OnceLock;
-use std::time::UNIX_EPOCH;
-
 use serde::Serialize;
 use serde_json::{json, Value};
+#[cfg(test)]
+use std::path::Path;
+use std::path::PathBuf;
+use std::sync::OnceLock;
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 
@@ -70,6 +69,12 @@ pub struct RuntimeProvenance {
     pub build: BuildProvenance,
     pub process: ProcessProvenance,
     pub binary: BinaryProvenance,
+}
+
+#[derive(Debug, Clone)]
+pub struct RuntimeProvenanceSnapshot {
+    pub executable_path: PathBuf,
+    pub provenance: RuntimeProvenance,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -131,13 +136,38 @@ pub fn build_provenance() -> &'static BuildProvenance {
     BUILD_PROVENANCE.get_or_init(BuildProvenance::from_build_env)
 }
 
-/// Capture process + binary metadata for the running executable path.
-pub fn capture_runtime_provenance(executable_path: &Path) -> RuntimeProvenance {
-    let metadata = fs::metadata(executable_path).ok();
-    let modified_unix_ms = metadata
-        .as_ref()
-        .and_then(|meta| meta.modified().ok())
-        .and_then(system_time_to_unix_ms);
+/// Captures process and binary metadata for the current executable.
+///
+/// # Errors
+/// Returns an I/O error when the operating system cannot resolve the current
+/// executable path.
+///
+/// # Security
+/// The executable path is resolved from `std::env::current_exe()` inside this
+/// function. Production callers cannot supply arbitrary filesystem paths, and
+/// the attestation intentionally avoids filesystem metadata reads from that
+/// path.
+pub fn capture_runtime_provenance() -> std::io::Result<RuntimeProvenanceSnapshot> {
+    let executable_path = std::env::current_exe()?;
+    let provenance = RuntimeProvenance {
+        build: build_provenance().clone(),
+        process: ProcessProvenance {
+            pid: std::process::id(),
+            executable_path: executable_path.display().to_string(),
+        },
+        binary: BinaryProvenance {
+            file_size_bytes: None,
+            modified_unix_ms: None,
+        },
+    };
+    Ok(RuntimeProvenanceSnapshot {
+        executable_path,
+        provenance,
+    })
+}
+
+#[cfg(test)]
+pub(crate) fn capture_runtime_provenance_for_test(executable_path: &Path) -> RuntimeProvenance {
     RuntimeProvenance {
         build: build_provenance().clone(),
         process: ProcessProvenance {
@@ -145,8 +175,8 @@ pub fn capture_runtime_provenance(executable_path: &Path) -> RuntimeProvenance {
             executable_path: executable_path.display().to_string(),
         },
         binary: BinaryProvenance {
-            file_size_bytes: metadata.as_ref().map(|meta| meta.len()),
-            modified_unix_ms,
+            file_size_bytes: None,
+            modified_unix_ms: None,
         },
     }
 }
@@ -313,11 +343,6 @@ fn build_identity(component: &str, server_version: &str, revision: &str, dirty: 
         value.push_str("-dirty");
     }
     value
-}
-
-fn system_time_to_unix_ms(value: std::time::SystemTime) -> Option<u64> {
-    let duration = value.duration_since(UNIX_EPOCH).ok()?;
-    Some(duration.as_millis().min(u128::from(u64::MAX)) as u64)
 }
 
 fn now_rfc3339() -> String {
