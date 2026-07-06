@@ -16,7 +16,7 @@
 //! * `docs/RUNBOOK.md`
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::UNIX_EPOCH;
 
@@ -70,6 +70,12 @@ pub struct RuntimeProvenance {
     pub build: BuildProvenance,
     pub process: ProcessProvenance,
     pub binary: BinaryProvenance,
+}
+
+#[derive(Debug, Clone)]
+pub struct RuntimeProvenanceSnapshot {
+    pub executable_path: PathBuf,
+    pub provenance: RuntimeProvenance,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -131,8 +137,26 @@ pub fn build_provenance() -> &'static BuildProvenance {
     BUILD_PROVENANCE.get_or_init(BuildProvenance::from_build_env)
 }
 
-/// Capture process + binary metadata for the running executable path.
-pub fn capture_runtime_provenance(executable_path: &Path) -> RuntimeProvenance {
+/// Captures process and binary metadata for the current executable.
+///
+/// # Errors
+/// Returns an I/O error when the operating system cannot resolve the current
+/// executable path.
+///
+/// # Security
+/// The executable path is resolved from `std::env::current_exe()` inside this
+/// function. Production callers cannot supply arbitrary filesystem paths for
+/// provenance metadata reads.
+pub fn capture_runtime_provenance() -> std::io::Result<RuntimeProvenanceSnapshot> {
+    let executable_path = std::env::current_exe()?;
+    let provenance = capture_runtime_provenance_for_executable_path(&executable_path);
+    Ok(RuntimeProvenanceSnapshot {
+        executable_path,
+        provenance,
+    })
+}
+
+fn capture_runtime_provenance_for_executable_path(executable_path: &Path) -> RuntimeProvenance {
     let metadata = fs::metadata(executable_path).ok();
     let modified_unix_ms = metadata
         .as_ref()
@@ -149,6 +173,11 @@ pub fn capture_runtime_provenance(executable_path: &Path) -> RuntimeProvenance {
             modified_unix_ms,
         },
     }
+}
+
+#[cfg(test)]
+pub(crate) fn capture_runtime_provenance_for_test(executable_path: &Path) -> RuntimeProvenance {
+    capture_runtime_provenance_for_executable_path(executable_path)
 }
 
 /// Build the fleet attestation envelope (schema v2) from runtime provenance.

@@ -245,12 +245,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         err
     })?);
 
-    let executable_path = std::env::current_exe().map_err(|err| {
+    let runtime_snapshot = capture_runtime_provenance().map_err(|err| {
         std::io::Error::other(format!(
             "failed to resolve executable path for startup admission: {err}"
         ))
     })?;
-    let runtime_provenance = Arc::new(capture_runtime_provenance(&executable_path));
+    let executable_path = runtime_snapshot.executable_path;
+    let runtime_provenance = Arc::new(runtime_snapshot.provenance);
     let admission = evaluate_startup_admission(
         &config.startup_admission,
         &executable_path,

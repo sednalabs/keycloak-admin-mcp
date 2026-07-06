@@ -358,7 +358,7 @@ fn is_stale(gate_modified: SystemTime, exe_modified: SystemTime) -> bool {
 mod tests {
     use super::*;
     use crate::config::{StartupAdmissionConfig, StartupAdmissionMode, TestGateProfile};
-    use crate::provenance::capture_runtime_provenance;
+    use crate::provenance::capture_runtime_provenance_for_test;
     use std::fs;
     use std::sync::atomic::{AtomicU64, Ordering};
     use time::Duration;
@@ -406,7 +406,7 @@ mod tests {
         let config = base_config(StartupAdmissionMode::Warn);
         let exe = temp_path("kc-admin-exe");
         fs::write(&exe, "bin").expect("write exe");
-        let runtime = capture_runtime_provenance(&exe);
+        let runtime = capture_runtime_provenance_for_test(&exe);
         let result = evaluate_startup_admission(&config, &exe, &runtime);
         assert_eq!(result.outcome, AdmissionOutcome::Warning);
         let _ = fs::remove_file(exe);
@@ -417,7 +417,7 @@ mod tests {
         let config = base_config(StartupAdmissionMode::Strict);
         let exe = temp_path("kc-admin-exe");
         fs::write(&exe, "bin").expect("write exe");
-        let runtime = capture_runtime_provenance(&exe);
+        let runtime = capture_runtime_provenance_for_test(&exe);
         let result = evaluate_startup_admission(&config, &exe, &runtime);
         assert_eq!(result.outcome, AdmissionOutcome::Rejected);
         let _ = fs::remove_file(exe);
@@ -429,7 +429,7 @@ mod tests {
         let exe = temp_path("kc-admin-exe");
         fs::write(&exe, "bin").expect("write exe");
         std::thread::sleep(std::time::Duration::from_millis(25));
-        let runtime = capture_runtime_provenance(&exe);
+        let runtime = capture_runtime_provenance_for_test(&exe);
         let expires = (OffsetDateTime::now_utc() + Duration::hours(1))
             .format(&Rfc3339)
             .expect("format expires");
@@ -445,7 +445,7 @@ mod tests {
         let config = base_config(StartupAdmissionMode::Strict);
         let exe = temp_path("kc-admin-exe");
         fs::write(&exe, "bin").expect("write exe");
-        let runtime = capture_runtime_provenance(&exe);
+        let runtime = capture_runtime_provenance_for_test(&exe);
         let expires = (OffsetDateTime::now_utc() - Duration::minutes(5))
             .format(&Rfc3339)
             .expect("format expires");
