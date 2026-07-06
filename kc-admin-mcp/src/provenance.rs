@@ -15,14 +15,12 @@
 //! * `docs/provenance-test-gate-design.md`
 //! * `docs/RUNBOOK.md`
 
+use serde::Serialize;
+use serde_json::{json, Value};
 #[cfg(test)]
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::OnceLock;
-use std::time::UNIX_EPOCH;
-
-use serde::Serialize;
-use serde_json::{json, Value};
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 
@@ -146,15 +144,11 @@ pub fn build_provenance() -> &'static BuildProvenance {
 ///
 /// # Security
 /// The executable path is resolved from `std::env::current_exe()` inside this
-/// function. Production callers cannot supply arbitrary filesystem paths for
-/// provenance metadata reads.
+/// function. Production callers cannot supply arbitrary filesystem paths, and
+/// the attestation intentionally avoids filesystem metadata reads from that
+/// path.
 pub fn capture_runtime_provenance() -> std::io::Result<RuntimeProvenanceSnapshot> {
     let executable_path = std::env::current_exe()?;
-    let metadata = executable_path.metadata().ok();
-    let modified_unix_ms = metadata
-        .as_ref()
-        .and_then(|meta| meta.modified().ok())
-        .and_then(system_time_to_unix_ms);
     let provenance = RuntimeProvenance {
         build: build_provenance().clone(),
         process: ProcessProvenance {
@@ -162,8 +156,8 @@ pub fn capture_runtime_provenance() -> std::io::Result<RuntimeProvenanceSnapshot
             executable_path: executable_path.display().to_string(),
         },
         binary: BinaryProvenance {
-            file_size_bytes: metadata.as_ref().map(|meta| meta.len()),
-            modified_unix_ms,
+            file_size_bytes: None,
+            modified_unix_ms: None,
         },
     };
     Ok(RuntimeProvenanceSnapshot {
@@ -349,11 +343,6 @@ fn build_identity(component: &str, server_version: &str, revision: &str, dirty: 
         value.push_str("-dirty");
     }
     value
-}
-
-fn system_time_to_unix_ms(value: std::time::SystemTime) -> Option<u64> {
-    let duration = value.duration_since(UNIX_EPOCH).ok()?;
-    Some(duration.as_millis().min(u128::from(u64::MAX)) as u64)
 }
 
 fn now_rfc3339() -> String {
