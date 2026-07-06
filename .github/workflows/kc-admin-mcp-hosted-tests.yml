@@ -1,0 +1,47 @@
+name: kc-admin-mcp-hosted-tests
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/kc-admin-mcp-hosted-tests.yml"
+      - "docs/**"
+      - "kc-admin-gateway/**"
+      - "kc-admin-mcp/**"
+      - "Cargo.lock"
+      - "Cargo.toml"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/kc-admin-mcp-hosted-tests.yml"
+      - "docs/**"
+      - "kc-admin-gateway/**"
+      - "kc-admin-mcp/**"
+      - "Cargo.lock"
+      - "Cargo.toml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout keycloak-admin-mcp
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
+        with:
+          toolchain: stable
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+
+      - name: Test kc-admin-gateway
+        run: cargo test --locked -p kc-admin-gateway
+
+      - name: Test kc-admin-mcp
+        run: cargo test --locked -p kc-admin-mcp

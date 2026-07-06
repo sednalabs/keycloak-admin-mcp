@@ -18,7 +18,10 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use mcp_toolkit_core::notifications::{ToolListTracker, ToolListUpdate};
+use mcp_toolkit_core::{
+    notifications::{ToolListTracker, ToolListUpdate},
+    rmcp_models,
+};
 use rmcp::handler::server::router::tool::ToolRouter;
 use rmcp::handler::server::tool::ToolCallContext;
 use rmcp::model::{
@@ -146,18 +149,17 @@ impl KcAdminMcp {
 impl ServerHandler for KcAdminMcp {
     /// Return server metadata, versioning, and capabilities.
     fn get_info(&self) -> ServerInfo {
-        ServerInfo::new(
+        rmcp_models::server_info(
+            ProtocolVersion::V_2024_11_05,
             ServerCapabilities::builder()
                 .enable_tools()
                 .enable_resources()
                 .enable_tool_list_changed()
                 .build(),
-        )
-        .with_protocol_version(ProtocolVersion::V_2024_11_05)
-        .with_server_info(Implementation::from_build_env())
-        .with_instructions(
-            "Keycloak admin MCP server (Rust). Auth enforced; tools delegate to kc-admin-gateway."
-                .to_string(),
+            Implementation::from_build_env(),
+            Some(
+                "Keycloak admin MCP server (Rust). Auth enforced; tools delegate to kc-admin-gateway.".to_string(),
+            ),
         )
     }
 
@@ -391,7 +393,7 @@ impl ServerHandler for KcAdminMcp {
             text,
             meta: None,
         };
-        std::future::ready(Ok(ReadResourceResult::new(vec![contents])))
+        std::future::ready(Ok(rmcp_models::read_resource_result(vec![contents])))
     }
 }
 

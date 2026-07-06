@@ -44,7 +44,10 @@ pub fn validate_realm_name(realm: &str) -> Result<(), McpError> {
     if !get_realm_regex().is_match(realm) {
         return Err(McpError::new(
             ErrorCode(-32602),
-            format!("invalid realm name format: '{}' (must be alphanumeric, '-', or '_')", realm),
+            format!(
+                "invalid realm name format: '{}' (must be alphanumeric, '-', or '_')",
+                realm
+            ),
             None,
         ));
     }
@@ -86,7 +89,10 @@ pub fn validate_no_path_traversal(input: &str, field_name: &str) -> Result<(), M
     if input.contains('/') || input.contains('\\') || input.contains("..") {
         return Err(McpError::new(
             ErrorCode(-32602),
-            format!("invalid characters in {}: path traversal detected", field_name),
+            format!(
+                "invalid characters in {}: path traversal detected",
+                field_name
+            ),
             None,
         ));
     }

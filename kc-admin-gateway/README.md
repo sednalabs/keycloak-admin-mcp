@@ -55,6 +55,16 @@ Optional:
 - `KC_GATEWAY_LOG_EXCHANGE_BODY` (default `false`, redacted error body on token exchange failure)
 - `KC_GATEWAY_LOG_EXCHANGE_BODY_MAX_BYTES` (default `2048`)
 
+Audience and exchange boundaries:
+
+- `KC_GATEWAY_EXPECTED_AUDIENCE` is the inbound gateway audience. It is distinct
+  from the MCP resource audience unless your realm deliberately uses the same
+  value for both hops.
+- `KC_GATEWAY_EXCHANGE_AUDIENCE` is the optional downstream audience requested
+  during token exchange.
+- `KC_GATEWAY_EXCHANGE_RESOURCE` is only for deployments whose token-exchange
+  path supports resource indicators; validate realm support before rollout.
+
 Audit hashing is **off by default** and requires a secret salt when enabled. Only
 hashed identifiers are emitted to logs (no raw subjects or client IDs).
 
@@ -62,16 +72,6 @@ Production guardrails: when `KC_GATEWAY_BUILD_PRODUCTION=true`, startup requires
 `KC_GATEWAY_EXPECTED_ISSUER`, `KC_GATEWAY_EXPECTED_AUDIENCE`, and non-empty
 `KC_GATEWAY_ALLOWED_AZP` (unless explicit break-glass `KC_GATEWAY_ALLOW_OPEN_AZP=true`
 with required reason and TTL).
-
-Audience note: `KC_GATEWAY_EXPECTED_AUDIENCE` protects the inbound gateway hop.
-It must be present in caller tokens independently of the MCP resource audience,
-unless your realm deliberately maps the same value to both surfaces.
-`KC_GATEWAY_EXCHANGE_AUDIENCE` is different: it is the optional RFC 8693
-audience requested for the exchanged downstream token. A request can pass MCP
-auth and still fail at the gateway if the caller token lacks the gateway
-audience, or fail during exchange if Keycloak does not allow the exchange
-client to request the downstream audience. Use the response `x-request-id` to
-correlate auth logs before changing realm mappings.
 
 ## Run locally
 

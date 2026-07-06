@@ -22,6 +22,34 @@ async fn mcp_prm_smoke() {
 }
 
 #[tokio::test]
+async fn mcp_authorization_server_metadata_smoke() {
+    let base = match env::var("KC_IT_MCP_URL") {
+        Ok(value) => value,
+        Err(_) => {
+            eprintln!("KC_IT_MCP_URL not set; skipping auth metadata smoke test");
+            return;
+        }
+    };
+
+    let url = format!(
+        "{}/.well-known/oauth-authorization-server/mcp",
+        base.trim_end_matches('/')
+    );
+    let response = reqwest::get(url).await.expect("auth metadata request");
+    assert!(response.status().is_success());
+    let payload: serde_json::Value = response.json().await.expect("auth metadata json");
+    assert!(payload["issuer"].is_string());
+    assert!(payload["authorization_endpoint"].is_string());
+    assert!(payload["token_endpoint"].is_string());
+    assert!(payload["device_authorization_endpoint"].is_string());
+    assert!(payload["grant_types_supported"]
+        .as_array()
+        .is_some_and(|items| items.iter().any(|item| {
+            item.as_str() == Some("urn:ietf:params:oauth:grant-type:device_code")
+        })));
+}
+
+#[tokio::test]
 async fn mcp_requires_auth() {
     let base = match env::var("KC_IT_MCP_URL") {
         Ok(value) => value,

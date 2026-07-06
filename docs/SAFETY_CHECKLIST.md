@@ -7,10 +7,8 @@ Use this checklist whenever you add or change privileged capabilities.
 - [ ] MCP requires scope + role gates for every tool.
 - [ ] Gateway introspects user tokens and enforces scopes per route family.
 - [ ] Gateway performs RFC 8693 exchange only when enabled and configured.
-- [ ] Delegated token-exchange mode, if enabled, has green policy vectors for
-      scope, audience, realm, actor-chain, proof-mode, and audit-binding denials.
-- [ ] Token exchange requests do not ask Keycloak for broader scopes than the
-      caller token already carries.
+- [ ] If delegated or standard token exchange is enabled, negative-path
+      coverage from `docs/delegated-admin-exchange-design.md` is complete.
 - [ ] MCP → Gateway mTLS is enabled where required and certificates are configured.
 - [ ] No raw tokens are logged or forwarded to downstream systems.
 - [ ] Client registration policy create/update/delete operations are scoped to the Allowed Client Scopes component and require realm write access.

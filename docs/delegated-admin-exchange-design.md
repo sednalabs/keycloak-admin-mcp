@@ -82,7 +82,7 @@ sequenceDiagram
 
 Keep static gateway service-account roles as the default. Add an opt-in
 `standard_token_exchange` mode only after the policy oracle exists and has
-adversarial vector coverage.
+explicit negative-path coverage.
 
 Suggested future configuration:
 
