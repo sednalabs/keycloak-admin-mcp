@@ -15,8 +15,9 @@
 //! * `docs/provenance-test-gate-design.md`
 //! * `docs/RUNBOOK.md`
 
-use std::fs;
-use std::path::{Path, PathBuf};
+#[cfg(test)]
+use std::path::Path;
+use std::path::PathBuf;
 use std::sync::OnceLock;
 use std::time::UNIX_EPOCH;
 
@@ -149,20 +150,12 @@ pub fn build_provenance() -> &'static BuildProvenance {
 /// provenance metadata reads.
 pub fn capture_runtime_provenance() -> std::io::Result<RuntimeProvenanceSnapshot> {
     let executable_path = std::env::current_exe()?;
-    let provenance = capture_runtime_provenance_for_executable_path(&executable_path);
-    Ok(RuntimeProvenanceSnapshot {
-        executable_path,
-        provenance,
-    })
-}
-
-fn capture_runtime_provenance_for_executable_path(executable_path: &Path) -> RuntimeProvenance {
-    let metadata = fs::metadata(executable_path).ok();
+    let metadata = executable_path.metadata().ok();
     let modified_unix_ms = metadata
         .as_ref()
         .and_then(|meta| meta.modified().ok())
         .and_then(system_time_to_unix_ms);
-    RuntimeProvenance {
+    let provenance = RuntimeProvenance {
         build: build_provenance().clone(),
         process: ProcessProvenance {
             pid: std::process::id(),
@@ -172,12 +165,26 @@ fn capture_runtime_provenance_for_executable_path(executable_path: &Path) -> Run
             file_size_bytes: metadata.as_ref().map(|meta| meta.len()),
             modified_unix_ms,
         },
-    }
+    };
+    Ok(RuntimeProvenanceSnapshot {
+        executable_path,
+        provenance,
+    })
 }
 
 #[cfg(test)]
 pub(crate) fn capture_runtime_provenance_for_test(executable_path: &Path) -> RuntimeProvenance {
-    capture_runtime_provenance_for_executable_path(executable_path)
+    RuntimeProvenance {
+        build: build_provenance().clone(),
+        process: ProcessProvenance {
+            pid: std::process::id(),
+            executable_path: executable_path.display().to_string(),
+        },
+        binary: BinaryProvenance {
+            file_size_bytes: None,
+            modified_unix_ms: None,
+        },
+    }
 }
 
 /// Build the fleet attestation envelope (schema v2) from runtime provenance.
