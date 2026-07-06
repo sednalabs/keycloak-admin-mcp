@@ -1022,8 +1022,8 @@ mod tests {
     #[test]
     fn authorization_server_metadata_uses_configured_keycloak_issuer() {
         let mut config = crate::test_support::build_config(
-            "http://127.0.0.1:9300".to_string(),
-            "http://127.0.0.1:8080".to_string(),
+            "https://mcp.example".to_string(),
+            "https://keycloak.example".to_string(),
         );
         config.authorization_servers = vec!["https://auth.example/realms/example/".to_string()];
 
@@ -1058,8 +1058,8 @@ mod tests {
     #[test]
     fn auth_surface_issuer_rejects_multiple_authorization_servers() {
         let mut config = crate::test_support::build_config(
-            "http://127.0.0.1:9300".to_string(),
-            "http://127.0.0.1:8080".to_string(),
+            "https://mcp.example".to_string(),
+            "https://keycloak.example".to_string(),
         );
         config.authorization_servers = vec![
             "https://auth.example/realms/one".to_string(),
