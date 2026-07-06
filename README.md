@@ -143,7 +143,12 @@ Start the gateway and MCP server with the environment shown in
 [`docs/RUNBOOK.md`](docs/RUNBOOK.md):
 
 ```bash
+# Terminal 1: start the gateway
 cargo run -p kc-admin-gateway
+```
+
+```bash
+# Terminal 2: start the MCP server
 cargo run -p kc-admin-mcp
 ```
 
@@ -205,10 +210,10 @@ Tool schema changes should update the snapshot contract intentionally:
 
 ```bash
 # Strict contract check
-keycloak-admin-mcp.kc-admin-mcp-test
+cargo test --locked -p kc-admin-mcp tool_schema_snapshot_contract_is_stable
 
 # Intentional rebaseline
-keycloak-admin-mcp.kc-admin-mcp-test-update-tool-snapshots
+MCP_TOOLKIT_UPDATE_TOOL_SNAPSHOTS=1 cargo test --locked -p kc-admin-mcp tool_schema_snapshot_contract_is_stable
 ```
 
 Prefer the documented hosted workflows for release or publication evidence.
