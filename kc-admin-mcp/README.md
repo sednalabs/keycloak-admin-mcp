@@ -14,6 +14,8 @@ KC_ADMIN_MCP_GATEWAY_URL=http://127.0.0.1:9300 \
 KC_ADMIN_MCP_RESOURCE_URL=http://127.0.0.1:9400/mcp \
 KC_ADMIN_MCP_RESOURCE_METADATA_URL=http://127.0.0.1:9400/.well-known/oauth-protected-resource/mcp \
 KC_ADMIN_MCP_AUTH_MODE=introspection \
+KC_ADMIN_MCP_ISSUER=http://127.0.0.1:8080/realms/example-realm \
+KC_ADMIN_MCP_AUDIENCE=http://127.0.0.1:9400/mcp \
 KC_ADMIN_MCP_INTROSPECTION_URL=http://127.0.0.1:8080/realms/example-realm/protocol/openid-connect/token/introspect \
 KC_ADMIN_MCP_INTROSPECTION_CLIENT_ID=kc-admin-mcp \
 KC_ADMIN_MCP_INTROSPECTION_CLIENT_SECRET=change-me \
@@ -25,21 +27,55 @@ cargo run
 
 The MCP endpoint is served at `http://127.0.0.1:9400/mcp`.
 
+## Device-auth login
+
+For headless or remote MCP clients that support OAuth device flow, `kc-admin-mcp`
+advertises device-auth discovery for `/mcp`.
+
+Example:
+
+```bash
+codex mcp login keycloak-admin-mcp --device-auth
+```
+
+Relevant discovery routes:
+
+- `/.well-known/oauth-protected-resource/mcp`
+- `/.well-known/oauth-authorization-server/mcp`
+- `/.well-known/openid-configuration/mcp`
+
+Root aliases are also served for single-issuer publication:
+
+- `/.well-known/oauth-protected-resource`
+- `/.well-known/oauth-authorization-server`
+- `/.well-known/openid-configuration`
+- `/mcp/.well-known/oauth-protected-resource`
+- `/mcp/.well-known/oauth-authorization-server`
+- `/mcp/.well-known/openid-configuration`
+
+Successful device login still does not bypass server-side scope or role checks.
+If the linked principal does not project the configured read role
+(`KC_ADMIN_MCP_ROLE_READ`, default `kc-admin:read`) or configured write role
+(`KC_ADMIN_MCP_ROLE_WRITE`, default `kc-admin:write`) as needed, tools can still
+fail later with `auth.missing_roles`.
+
 ## Configuration
 
 ### Core
 - `KC_ADMIN_MCP_BIND`: bind address (default `127.0.0.1:9400`).
 - `KC_ADMIN_MCP_RESOURCE_URL`: resource URL for audience checks.
 - `KC_ADMIN_MCP_RESOURCE_METADATA_URL`: PRM URL in `WWW-Authenticate`.
-- `KC_ADMIN_MCP_AUTH_SERVERS`: comma-separated list of auth servers.
+- `KC_ADMIN_MCP_AUTH_SERVERS`: optional authorization server override. Device-auth
+  and OIDC publication currently require exactly one issuer; omit this to derive
+  metadata from `KC_ADMIN_MCP_ISSUER`.
 - `KC_ADMIN_MCP_SCOPES_SUPPORTED`: override supported scopes.
 - `KC_ADMIN_MCP_TLS_CERT`, `KC_ADMIN_MCP_TLS_KEY`: enable HTTPS for the MCP server.
 - `KC_ADMIN_MCP_TLS_CLIENT_CA`: client CA bundle for native mTLS.
 
 ### Auth (resource server)
 - `KC_ADMIN_MCP_AUTH_MODE`: `introspection` (default) or `jwks`.
-- `KC_ADMIN_MCP_ISSUER`: expected issuer.
-- `KC_ADMIN_MCP_AUDIENCE`: expected audience.
+- `KC_ADMIN_MCP_ISSUER`: required expected realm issuer (example: `http://127.0.0.1:8080/realms/example-realm`).
+- `KC_ADMIN_MCP_AUDIENCE`: required expected audience (example: `http://127.0.0.1:9400/mcp`).
 - `KC_ADMIN_MCP_ALLOWED_AZP`: allowed `azp` values (comma-separated).
 - `KC_ADMIN_MCP_ALLOWED_CLIENT_IDS`: allowed client IDs (comma-separated).
 - `KC_ADMIN_MCP_BUILD_PRODUCTION`: production mode toggle (`1/true` requires caller allowlists unless break-glass is enabled).
@@ -101,9 +137,9 @@ The server publishes runtime provenance and attestation via MCP resources:
 ## Tool schema snapshot contract
 
 - Baseline snapshot: `spec/tool_schema_snapshot.v1.json`
-- Strict contract check: `cargo test -p kc-admin-mcp tool_schema_snapshot_contract_is_stable`
+- Strict contract check: `cargo test --locked -p kc-admin-mcp tool_schema_snapshot_contract_is_stable`
 - Intentional rebaseline:
-  `MCP_TOOLKIT_UPDATE_TOOL_SNAPSHOTS=1 cargo test -p kc-admin-mcp tool_schema_snapshot_contract_is_stable`
+  `MCP_TOOLKIT_UPDATE_TOOL_SNAPSHOTS=1 cargo test --locked -p kc-admin-mcp tool_schema_snapshot_contract_is_stable`
 
 ### Gateway
 - `KC_ADMIN_MCP_GATEWAY_URL`: gateway base URL (default `http://127.0.0.1:9300`).
@@ -144,5 +180,5 @@ If MCP TLS values are not set via env, the server will read:
 ## Tests
 
 ```bash
-cargo test
+cargo test --locked
 ```

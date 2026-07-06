@@ -9,8 +9,7 @@
 //!
 //! ## Security Boundaries
 //! * **Scope Gating**: Maps token scopes to required operational permissions.
-//! * **Token Posture**: Incoming token extraction is delegated to the shared
-//!   toolkit parser before this module enforces scopes and audit identity.
+//! * **Strict Parsing**: Rejects malformed auth headers before they reach the IdP.
 //!
 //! ## References
 //! * **SPEC**: [OAuth 2.0 (RFC 6749)](https://oauth.net/2/)
@@ -57,6 +56,42 @@ pub fn enforce_scopes(
             return Err(GatewayError::MissingScopes(scope.to_string()));
         }
     }
+    Ok(())
+}
+
+/// Validate the `Authorization` header shape so only a single `Bearer <token>` is accepted.
+/// Rejects control characters, extra whitespace, and non-Bearer schemes before the token is introspected.
+///
+/// # Security
+/// * **Attack Surface Reduction**: Prevents header injection and parsing ambiguity at the IdP edge.
+///
+/// # Errors
+/// * Returns an error if the operation fails.
+///
+/// # Caveats
+/// * None.
+pub(crate) fn validate_bearer_header(raw: &str) -> Result<(), GatewayError> {
+    if raw.trim() != raw {
+        return Err(GatewayError::MissingToken);
+    }
+
+    if raw.chars().any(|ch| ch.is_control()) {
+        return Err(GatewayError::MissingToken);
+    }
+
+    if raw.matches(' ').count() != 1 {
+        return Err(GatewayError::MissingToken);
+    }
+
+    let (scheme, token) = raw.split_once(' ').ok_or(GatewayError::MissingToken)?;
+    if !scheme.eq_ignore_ascii_case("bearer") {
+        return Err(GatewayError::MissingToken);
+    }
+
+    if token.is_empty() {
+        return Err(GatewayError::MissingToken);
+    }
+
     Ok(())
 }
 

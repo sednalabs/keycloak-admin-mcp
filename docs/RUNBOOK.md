@@ -24,11 +24,6 @@ Required env vars:
 - `KC_GATEWAY_EXCHANGE_CLIENT_ID`
 - `KC_GATEWAY_EXCHANGE_CLIENT_SECRET`
 
-The delegated-admin/token-exchange decision boundary is documented in
-`docs/delegated-admin-exchange-design.md`. Current deployments should treat the
-gateway service-account model as the default and any delegated mode as opt-in
-until the policy vectors and authenticated smoke tests are green.
-
 Optional env vars:
 
 - `KC_GATEWAY_ALLOWED_AZP`, `KC_GATEWAY_EXPECTED_ISSUER`, `KC_GATEWAY_EXPECTED_AUDIENCE`
@@ -75,37 +70,27 @@ Gateway route surface:
 
 ### Gateway audience and token exchange
 
-Gateway-backed deployments have two audience checks that are easy to confuse:
+Gateway-backed deployments have distinct audience/resource checks:
 
 - `KC_GATEWAY_EXPECTED_AUDIENCE` is the inbound audience the caller token must
-  contain before the gateway will authorize the request.
+  contain before the gateway authorizes a request.
+- `KC_ADMIN_MCP_AUDIENCE` is the MCP resource audience checked by the MCP
+  server; it is not a substitute for the gateway audience unless your realm
+  intentionally projects the same value into caller tokens.
 - `KC_GATEWAY_EXCHANGE_AUDIENCE` is the optional RFC 8693 `audience` value the
   gateway asks Keycloak to issue for the exchanged downstream token.
-
-The MCP resource audience, such as `KC_ADMIN_MCP_AUDIENCE`, is not a
-substitute for the gateway audience unless your realm intentionally maps the
-same value into caller tokens. In the common gateway pattern, the caller token
-needs both the MCP resource audience for the MCP edge and a gateway audience for
-the gateway hop.
-
-Verify the configuration before rollout:
-
-1. Introspect or decode a non-secret copy of the caller token and confirm `iss`
-   matches `KC_GATEWAY_EXPECTED_ISSUER`.
-2. Confirm the token `aud` list contains `KC_GATEWAY_EXPECTED_AUDIENCE`.
-3. Confirm `azp` or `client_id` is included in `KC_GATEWAY_ALLOWED_AZP`.
-4. If `KC_GATEWAY_EXCHANGE_AUDIENCE` is set, confirm the exchange client is
-   permitted to request that audience in Keycloak.
-5. If `KC_GATEWAY_EXCHANGE_RESOURCE` is set, confirm it matches the downstream
-   resource indicator expected by the admin API path.
+- `KC_GATEWAY_EXCHANGE_RESOURCE` is an optional resource-indicator value for
+  deployments that support it. Keycloak standard token exchange support is
+  audience-oriented; treat `resource` as a compatibility setting that must be
+  validated in the target realm before rollout.
 
 Troubleshooting:
 
 - A gateway `403` before token exchange usually means issuer, audience, scopes,
   roles, or `azp` did not pass the inbound gateway checks.
-- A token-exchange failure after the inbound checks usually means the exchange
-  client, requested audience, requested resource, or service-account roles are
-  not permitted for the RFC 8693 exchange.
+- A token-exchange failure after inbound checks usually means the exchange
+  client, requested audience/resource, or service-account roles are not
+  permitted for the exchange.
 - Capture `x-request-id` from the response and search gateway auth logs for the
   same request ID and auth reason bucket before changing realm settings.
 
@@ -113,10 +98,16 @@ Troubleshooting:
 
 Required env vars:
 
+- `KC_ADMIN_MCP_ISSUER`
+- `KC_ADMIN_MCP_AUDIENCE`
 - `KC_ADMIN_MCP_INTROSPECTION_URL`
 - `KC_ADMIN_MCP_INTROSPECTION_CLIENT_ID`
 - `KC_ADMIN_MCP_INTROSPECTION_CLIENT_SECRET`
 - `KC_ADMIN_MCP_GATEWAY_URL`
+
+Use the realm issuer, for example
+`http://127.0.0.1:8080/realms/example-realm`, so discovery metadata points
+clients at the realm authorization endpoints.
 
 Optional env vars:
 
@@ -125,7 +116,6 @@ Optional env vars:
 - `KC_ADMIN_MCP_ALLOW_OPEN_CALLER_ALLOWLISTS` (break-glass override; keep `false` in production)
 - `KC_ADMIN_MCP_ALLOW_OPEN_CALLER_ALLOWLISTS_REASON` (required when break-glass override is enabled)
 - `KC_ADMIN_MCP_ALLOW_OPEN_CALLER_ALLOWLISTS_TTL_S` (required positive TTL when break-glass override is enabled)
-- `KC_ADMIN_MCP_AUDIENCE`, `KC_ADMIN_MCP_ISSUER`
 - `KC_ADMIN_MCP_ROLE_READ`, `KC_ADMIN_MCP_ROLE_WRITE` (defaults: `kc-admin:read`, `kc-admin:write`)
 - `KC_ADMIN_MCP_ENABLE_SECRET_TOOLS` (default: false)
 - `KC_ADMIN_MCP_MTLS_MODE` (`disabled`, `native`, `proxy`)
@@ -149,6 +139,8 @@ KC_ADMIN_MCP_BIND=127.0.0.1:9400 \
 KC_ADMIN_MCP_RESOURCE_URL=http://127.0.0.1:9400/mcp \
 KC_ADMIN_MCP_RESOURCE_METADATA_URL=http://127.0.0.1:9400/.well-known/oauth-protected-resource/mcp \
 KC_ADMIN_MCP_AUTH_MODE=introspection \
+KC_ADMIN_MCP_ISSUER=http://127.0.0.1:8080/realms/example-realm \
+KC_ADMIN_MCP_AUDIENCE=http://127.0.0.1:9400/mcp \
 KC_ADMIN_MCP_INTROSPECTION_URL=http://127.0.0.1:8080/realms/example-realm/protocol/openid-connect/token/introspect \
 KC_ADMIN_MCP_INTROSPECTION_CLIENT_ID=kc-admin-mcp \
 KC_ADMIN_MCP_INTROSPECTION_CLIENT_SECRET=change-me \
@@ -165,6 +157,24 @@ Resource metadata:
 curl -sS http://127.0.0.1:9400/.well-known/oauth-protected-resource/mcp
 ```
 
+Authorization-server metadata for device auth:
+
+```bash
+curl -sS http://127.0.0.1:9400/.well-known/oauth-authorization-server/mcp
+```
+
+OIDC discovery alias:
+
+```bash
+curl -i http://127.0.0.1:9400/.well-known/openid-configuration/mcp
+```
+
+Headless device-auth login:
+
+```bash
+codex mcp login keycloak-admin-mcp --device-auth
+```
+
 Local HTTPS + native mTLS (example):
 
 ```bash
@@ -176,6 +186,8 @@ KC_ADMIN_MCP_TLS_KEY=/path/to/server.key \
 KC_ADMIN_MCP_TLS_CLIENT_CA=/path/to/ca.crt \
 KC_ADMIN_MCP_MTLS_MODE=native \
 KC_ADMIN_MCP_AUTH_MODE=introspection \
+KC_ADMIN_MCP_ISSUER=https://keycloak.example/realms/example-realm \
+KC_ADMIN_MCP_AUDIENCE=https://127.0.0.1:9443/mcp \
 KC_ADMIN_MCP_INTROSPECTION_URL=https://keycloak.example/realms/example-realm/protocol/openid-connect/token/introspect \
 KC_ADMIN_MCP_INTROSPECTION_CLIENT_ID=kc-admin-mcp \
 KC_ADMIN_MCP_INTROSPECTION_CLIENT_SECRET=change-me \
@@ -196,6 +208,13 @@ cargo run -p kc-admin-mcp
 
 - **401 Unauthorized**: token missing/expired or failed introspection.
 - **403 Forbidden**: token lacks scopes or required roles.
+- **OAuth device login is not advertised**: fetch `/.well-known/oauth-authorization-server/mcp`
+  and confirm `device_authorization_endpoint` is present.
+- **Device login succeeds but tools still fail with `auth.missing_roles`**: the OAuth
+  login path is working, but the linked principal still is not projecting the
+  configured admission roles into the access token. Confirm the token includes
+  `KC_ADMIN_MCP_ROLE_READ` for read tools and `KC_ADMIN_MCP_ROLE_WRITE` for write
+  tools; the documented defaults are `kc-admin:read` and `kc-admin:write`.
 - **Request ID**: capture `x-request-id` from responses to correlate logs.
 
 See `docs/SAFETY_CHECKLIST.md` for security guardrails and `docs/TEST_PLAN.md`

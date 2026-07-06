@@ -16,7 +16,6 @@ Operational docs:
 - `docs/RUNBOOK.md`
 - `docs/SAFETY_CHECKLIST.md`
 - `docs/TEST_PLAN.md`
-- `docs/delegated-admin-exchange-design.md`
 - `docs/provenance-test-gate-design.md`
 
 ## License

@@ -33,6 +33,7 @@ mod test_support;
 mod tls;
 mod tools;
 
+use std::collections::HashSet;
 use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -42,13 +43,20 @@ use axum::extract::State;
 use axum::http::{header, HeaderMap, HeaderValue, Method, Request, Response, StatusCode};
 use axum::middleware::Next;
 use axum::response::sse::{Event, Sse};
-use axum::response::IntoResponse;
+use axum::response::{IntoResponse, Redirect};
 use axum::routing::{any, get};
 use axum::Router;
 use futures::stream;
 use mcp_toolkit_auth::challenge::{build_bearer_challenge, BearerChallenge};
+use mcp_toolkit_auth::surface::{
+    AuthSurfaceConfig, AuthorizationServerMetadataSource, IssuerMetadataConfig,
+};
 use mcp_toolkit_auth::Authenticator;
 use mcp_toolkit_core::notifications::ToolListTracker;
+use mcp_toolkit_http::oauth::{
+    oidc_metadata_url, AuthorizationServerMetadata, GRANT_TYPE_AUTHORIZATION_CODE,
+    GRANT_TYPE_DEVICE_CODE,
+};
 use mcp_toolkit_http::session::{
     BoundedSessionManager, EventStore, EventStoreConfig, RecordingSessionManager,
 };
@@ -82,6 +90,8 @@ pub type McpError = rmcp::ErrorData;
 struct AppState {
     config: Arc<config::Config>,
     authenticator: Arc<Authenticator>,
+    authorization_server_metadata: AuthorizationServerMetadata,
+    oidc_metadata_url: String,
     metrics: Arc<Metrics>,
     session_manager: Arc<BoundedSessionManager>,
     stateful_service: StreamableHttpService<KcAdminMcp, RecordingSessionManager>,
@@ -97,8 +107,19 @@ impl AppState {
         runtime_provenance: Arc<RuntimeProvenance>,
         runtime_admission: RuntimeAdmissionExtension,
     ) -> Result<Self, String> {
-        let authenticator = build_authenticator(&config)
-            .map_err(|err| format!("failed to initialize authenticator: {err}"))?;
+        let authenticator = Arc::new(
+            build_authenticator(&config)
+                .map_err(|err| format!("failed to initialize authenticator: {err}"))?,
+        );
+        let authorization_server_metadata = keycloak_authorization_server_metadata(&config)
+            .map_err(|err| format!("failed to derive auth-surface metadata: {err}"))?;
+        keycloak_auth_surface_config(
+            &config,
+            authenticator.clone(),
+            authorization_server_metadata.clone(),
+        )
+        .map_err(|err| format!("failed to validate auth-surface configuration: {err}"))?;
+        let oidc_metadata_url = oidc_metadata_url(&authorization_server_metadata.issuer);
         let metrics = Arc::new(Metrics::new());
         let audit_log = Arc::new(AuditLog::new(
             config.audit_log_max,
@@ -137,6 +158,9 @@ impl AppState {
         let service_started = started_at;
         let service_provenance = runtime_provenance.clone();
         let service_runtime_admission = runtime_admission.clone();
+        let mut stateful_http_config = StreamableHttpServerConfig::default();
+        stateful_http_config.sse_retry = sse_retry;
+        stateful_http_config.cancellation_token = cancellation_token.child_token();
         let stateful_service = StreamableHttpService::new(
             move || {
                 Ok(KcAdminMcp::new(
@@ -151,9 +175,7 @@ impl AppState {
                 ))
             },
             recording_session_manager.clone(),
-            StreamableHttpServerConfig::default()
-                .with_sse_retry(sse_retry)
-                .with_cancellation_token(cancellation_token.child_token()),
+            stateful_http_config,
         );
         let stateless_service = if config.streamable_http.stateless_fallback {
             let stateless_config = config.clone();
@@ -164,6 +186,10 @@ impl AppState {
             let stateless_started = started_at;
             let stateless_provenance = runtime_provenance.clone();
             let stateless_runtime_admission = runtime_admission.clone();
+            let mut stateless_http_config = StreamableHttpServerConfig::default();
+            stateless_http_config.sse_retry = None;
+            stateless_http_config.stateful_mode = false;
+            stateless_http_config.cancellation_token = cancellation_token.child_token();
             Some(StreamableHttpService::new(
                 move || {
                     Ok(KcAdminMcp::new(
@@ -178,10 +204,7 @@ impl AppState {
                     ))
                 },
                 recording_session_manager.clone(),
-                StreamableHttpServerConfig::default()
-                    .with_sse_retry(None)
-                    .with_stateful_mode(false)
-                    .with_cancellation_token(cancellation_token.child_token()),
+                stateless_http_config,
             ))
         } else {
             None
@@ -189,7 +212,9 @@ impl AppState {
 
         Ok(Self {
             config,
-            authenticator: Arc::new(authenticator),
+            authenticator,
+            authorization_server_metadata,
+            oidc_metadata_url,
             metrics,
             session_manager,
             stateful_service,
@@ -315,6 +340,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "/.well-known/oauth-protected-resource/mcp",
             get(resource_metadata),
         )
+        .route(
+            "/mcp/.well-known/oauth-protected-resource",
+            get(resource_metadata),
+        )
+        .route(
+            "/.well-known/oauth-authorization-server",
+            get(authorization_server_metadata),
+        )
+        .route(
+            "/mcp/.well-known/oauth-authorization-server",
+            get(authorization_server_metadata),
+        )
+        .route(
+            "/.well-known/oauth-authorization-server/mcp",
+            get(authorization_server_metadata),
+        )
+        .route(
+            "/.well-known/openid-configuration",
+            get(oidc_metadata_redirect),
+        )
+        .route(
+            "/mcp/.well-known/openid-configuration",
+            get(oidc_metadata_redirect),
+        )
+        .route(
+            "/.well-known/openid-configuration/mcp",
+            get(oidc_metadata_redirect),
+        )
         .merge(mcp_router)
         .with_state(state.clone());
 
@@ -366,10 +419,117 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn resource_metadata(State(state): State<Arc<AppState>>) -> Response<Body> {
     let metadata = ResourceMetadata {
         resource: state.config.resource_url.clone(),
-        authorization_servers: state.config.authorization_servers.clone(),
+        authorization_servers: vec![state.authorization_server_metadata.issuer.clone()],
         scopes_supported: state.config.scopes_supported.clone(),
     };
-    let body = serde_json::to_vec(&metadata).unwrap_or_else(|_| b"{}".to_vec());
+    json_response(&metadata)
+}
+
+async fn authorization_server_metadata(State(state): State<Arc<AppState>>) -> Response<Body> {
+    json_response(&state.authorization_server_metadata)
+}
+
+async fn oidc_metadata_redirect(State(state): State<Arc<AppState>>) -> Response<Body> {
+    Redirect::temporary(&state.oidc_metadata_url).into_response()
+}
+
+fn keycloak_authorization_server_metadata(
+    config: &config::Config,
+) -> Result<AuthorizationServerMetadata, String> {
+    let issuer = keycloak_auth_surface_issuer(config)?;
+
+    Ok(AuthorizationServerMetadata {
+        issuer: issuer.clone(),
+        authorization_endpoint: format!("{issuer}/protocol/openid-connect/auth"),
+        token_endpoint: format!("{issuer}/protocol/openid-connect/token"),
+        registration_endpoint: Some(format!("{issuer}/clients-registrations/openid-connect")),
+        jwks_uri: Some(format!("{issuer}/protocol/openid-connect/certs")),
+        introspection_endpoint: Some(format!("{issuer}/protocol/openid-connect/token/introspect")),
+        device_authorization_endpoint: Some(format!(
+            "{issuer}/protocol/openid-connect/auth/device"
+        )),
+        grant_types_supported: Some(vec![
+            GRANT_TYPE_AUTHORIZATION_CODE.to_string(),
+            GRANT_TYPE_DEVICE_CODE.to_string(),
+        ]),
+        client_id_metadata_document_supported: None,
+        token_endpoint_auth_methods_supported: None,
+        code_challenge_methods_supported: None,
+    })
+}
+
+fn keycloak_auth_surface_issuer(config: &config::Config) -> Result<String, String> {
+    let authorization_servers: Vec<String> = config
+        .authorization_servers
+        .iter()
+        .map(|value| value.trim().trim_end_matches('/'))
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
+        .collect();
+
+    match authorization_servers.as_slice() {
+        [issuer] => Ok(issuer.clone()),
+        [] => config
+            .auth
+            .issuer
+            .as_ref()
+            .map(|value| value.trim().trim_end_matches('/'))
+            .filter(|value| !value.is_empty())
+            .map(str::to_string)
+            .ok_or_else(|| "No authorization server is configured.".to_string()),
+        many => Err(format!(
+            "kc-admin-mcp auth surface requires exactly one authorization server; got {}",
+            many.len()
+        )),
+    }
+}
+
+fn keycloak_auth_surface_config(
+    config: &config::Config,
+    authenticator: Arc<Authenticator>,
+    authorization_server_metadata: AuthorizationServerMetadata,
+) -> Result<AuthSurfaceConfig, String> {
+    let public_base_url = auth_surface_public_base_url(&config.resource_url)?;
+    AuthSurfaceConfig::single_issuer_from_metadata_source(
+        public_base_url,
+        IssuerMetadataConfig {
+            resource_path: "/mcp".to_string(),
+            metadata_source: AuthorizationServerMetadataSource::Explicit(
+                authorization_server_metadata,
+            ),
+            realm: "kc-admin-mcp".to_string(),
+            scopes_supported: config.scopes_supported.clone(),
+            allowed_client_ids: config
+                .auth
+                .allowed_client_ids
+                .iter()
+                .cloned()
+                .collect::<HashSet<_>>(),
+            authenticator,
+            resource_url_override: Some(config.resource_url.clone()),
+        },
+    )
+    .map(|auth_surface| auth_surface.with_detected_allow_insecure_http())
+    .map_err(|err| err.to_string())
+}
+
+fn auth_surface_public_base_url(resource_url: &str) -> Result<String, String> {
+    let trimmed = resource_url.trim().trim_end_matches('/');
+    let Some(public_base_url) = trimmed.strip_suffix("/mcp") else {
+        return Err(format!(
+            "KC_ADMIN_MCP_RESOURCE_URL must end with /mcp for auth-surface publication; got {resource_url}"
+        ));
+    };
+    if public_base_url.is_empty() {
+        return Err(format!(
+            "KC_ADMIN_MCP_RESOURCE_URL must include a base URL before /mcp; got {resource_url}"
+        ));
+    }
+    Ok(public_base_url.to_string())
+}
+
+fn json_response<T: serde::Serialize>(payload: &T) -> Response<Body> {
+    let body = serde_json::to_vec(payload).unwrap_or_else(|_| b"{}".to_vec());
     Response::builder()
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, "application/json")
@@ -790,7 +950,9 @@ fn header_value(headers: &HeaderMap, name: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::{
-        is_initialize_payload, jsonrpc_request_id, read_initialize_payload_bytes, session_error,
+        is_initialize_payload, jsonrpc_request_id, keycloak_auth_surface_issuer,
+        keycloak_authorization_server_metadata, read_initialize_payload_bytes, session_error,
+        GRANT_TYPE_AUTHORIZATION_CODE, GRANT_TYPE_DEVICE_CODE,
     };
     use axum::body::{to_bytes, Body};
     use axum::http::StatusCode;
@@ -855,5 +1017,59 @@ mod tests {
         assert_eq!(payload["id"], "abc-123");
         assert_eq!(payload["error"]["code"], -32600);
         assert_eq!(payload["error"]["message"], "Missing session ID.");
+    }
+
+    #[test]
+    fn authorization_server_metadata_uses_configured_keycloak_issuer() {
+        let mut config = crate::test_support::build_config(
+            "http://127.0.0.1:9300".to_string(),
+            "http://127.0.0.1:8080".to_string(),
+        );
+        config.authorization_servers = vec!["https://auth.example/realms/example/".to_string()];
+
+        let metadata = keycloak_authorization_server_metadata(&config).expect("metadata");
+
+        assert_eq!(metadata.issuer, "https://auth.example/realms/example");
+        assert_eq!(
+            metadata.authorization_endpoint,
+            "https://auth.example/realms/example/protocol/openid-connect/auth"
+        );
+        assert_eq!(
+            metadata.token_endpoint,
+            "https://auth.example/realms/example/protocol/openid-connect/token"
+        );
+        assert_eq!(
+            metadata.registration_endpoint.as_deref(),
+            Some("https://auth.example/realms/example/clients-registrations/openid-connect")
+        );
+        assert_eq!(
+            metadata.device_authorization_endpoint.as_deref(),
+            Some("https://auth.example/realms/example/protocol/openid-connect/auth/device")
+        );
+        assert_eq!(
+            metadata.grant_types_supported,
+            Some(vec![
+                GRANT_TYPE_AUTHORIZATION_CODE.to_string(),
+                GRANT_TYPE_DEVICE_CODE.to_string()
+            ])
+        );
+    }
+
+    #[test]
+    fn auth_surface_issuer_rejects_multiple_authorization_servers() {
+        let mut config = crate::test_support::build_config(
+            "http://127.0.0.1:9300".to_string(),
+            "http://127.0.0.1:8080".to_string(),
+        );
+        config.authorization_servers = vec![
+            "https://auth.example/realms/one".to_string(),
+            "https://auth.example/realms/two".to_string(),
+        ];
+
+        let err = keycloak_auth_surface_issuer(&config).expect_err("ambiguous issuer");
+        assert!(
+            err.contains("exactly one authorization server"),
+            "unexpected error: {err}"
+        );
     }
 }

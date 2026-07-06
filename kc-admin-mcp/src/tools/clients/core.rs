@@ -451,7 +451,7 @@ impl KcAdminMcp {
             .await
         {
             match err {
-                crate::gateway::GatewayError::Upstream { status, .. } if status == 404 => {
+                crate::gateway::GatewayError::Upstream { status, summary } if status == 404 => {
                     return Ok(tool_error(
                         "clients.not_found",
                         "Client not found.",
@@ -537,7 +537,7 @@ impl KcAdminMcp {
             .await
         {
             match err {
-                crate::gateway::GatewayError::Upstream { status, .. } if status == 404 => {
+                crate::gateway::GatewayError::Upstream { status, summary } if status == 404 => {
                     return Ok(tool_error(
                         "clients.not_found",
                         "Client not found.",
@@ -624,7 +624,7 @@ impl KcAdminMcp {
             .await
         {
             match err {
-                crate::gateway::GatewayError::Upstream { status, .. } if status == 404 => {
+                crate::gateway::GatewayError::Upstream { status, summary } if status == 404 => {
                     return Ok(tool_error(
                         "clients.not_found",
                         "Client not found.",
@@ -714,7 +714,7 @@ impl KcAdminMcp {
             .await
         {
             match err {
-                crate::gateway::GatewayError::Upstream { status, .. } if status == 404 => {
+                crate::gateway::GatewayError::Upstream { status, summary } if status == 404 => {
                     return Ok(tool_error(
                         "clients.not_found",
                         "Client not found.",
