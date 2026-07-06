@@ -1,0 +1,18 @@
+<!DOCTYPE qhelp SYSTEM "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>
+      Repositories that upload several SARIF files need stable upload
+      categories so GitHub code scanning can distinguish analyses by tool and
+      scan mode.
+    </p>
+  </overview>
+  <recommendation>
+    <p>
+      Set the <code>category</code> input on every
+      <code>github/codeql-action/upload-sarif</code> step. Use a stable value
+      such as <code>devskim/static-analysis</code> or
+      <code>trivy/filesystem</code>.
+    </p>
+  </recommendation>
+</qhelp>
