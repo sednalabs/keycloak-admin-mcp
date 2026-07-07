@@ -1,4 +1,5 @@
 use super::*;
+use mcp_toolkit_core::response_contract::MutationOutcome;
 
 #[derive(Debug, serde::Serialize, JsonSchema)]
 struct ScopeBindingCheckResult {
@@ -14,6 +15,9 @@ struct ScopeBindingCheckResult {
 #[derive(Debug, serde::Serialize, JsonSchema)]
 struct ScopeMutationSummary {
     outcome: String,
+    client: String,
+    changed: bool,
+    requested_state: String,
     scope_kind: String,
     requested_scope_ids: Vec<String>,
     already_bound: Vec<String>,
@@ -41,6 +45,103 @@ fn scope_kind_label(kind: ScopeKind) -> &'static str {
     match kind {
         ScopeKind::Default => "default",
         ScopeKind::Optional => "optional",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn values(items: &[&str]) -> Vec<String> {
+        items.iter().map(|item| (*item).to_string()).collect()
+    }
+
+    #[test]
+    fn repeated_attach_reports_already_bound_without_changes() {
+        let existing = values(&["scope-a"]);
+        let requested = values(&["scope-a"]);
+        let plan = scope_add_plan(&existing, &requested);
+        let outcome = mutation_outcome(
+            &plan.added,
+            &plan.removed,
+            false,
+            MutationOutcome::AlreadyBound,
+        );
+        let summary = scope_mutation_summary(
+            outcome,
+            "client-uuid",
+            "bound",
+            "default",
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
+            false,
+        );
+
+        assert_eq!(summary.outcome, "already_bound");
+        assert_eq!(summary.client, "client-uuid");
+        assert_eq!(summary.requested_state, "bound");
+        assert!(!summary.changed);
+        assert!(!summary.will_apply);
+    }
+
+    #[test]
+    fn repeated_remove_reports_already_unbound_without_changes() {
+        let existing = Vec::new();
+        let requested = values(&["scope-a"]);
+        let plan = scope_remove_plan(&existing, &requested);
+        let outcome = mutation_outcome(
+            &plan.added,
+            &plan.removed,
+            false,
+            MutationOutcome::AlreadyUnbound,
+        );
+        let summary = scope_mutation_summary(
+            outcome,
+            "client-uuid",
+            "unbound",
+            "optional",
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
+            false,
+        );
+
+        assert_eq!(summary.outcome, "already_unbound");
+        assert_eq!(summary.requested_state, "unbound");
+        assert!(!summary.changed);
+        assert!(!summary.will_apply);
+    }
+
+    #[test]
+    fn dry_run_attach_reports_preview_without_apply() {
+        let existing = Vec::new();
+        let requested = values(&["scope-a"]);
+        let plan = scope_add_plan(&existing, &requested);
+        let outcome = mutation_outcome(
+            &plan.added,
+            &plan.removed,
+            true,
+            MutationOutcome::AlreadyBound,
+        );
+        let summary = scope_mutation_summary(
+            outcome,
+            "client-uuid",
+            "bound",
+            "default",
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
+            true,
+        );
+
+        assert_eq!(summary.outcome, "would_add");
+        assert!(summary.changed);
+        assert!(!summary.will_apply);
+        assert!(summary.dry_run);
     }
 }
 
@@ -275,28 +376,53 @@ fn mutation_outcome(
     to_add: &[String],
     to_remove: &[String],
     dry_run: bool,
-    no_change_default: &str,
-) -> String {
+    no_change_default: MutationOutcome,
+) -> MutationOutcome {
     if to_add.is_empty() && to_remove.is_empty() {
-        return no_change_default.to_string();
+        return no_change_default;
     }
 
     if dry_run {
         if !to_add.is_empty() && !to_remove.is_empty() {
-            "would_update".to_string()
+            MutationOutcome::WouldUpdate
         } else if !to_add.is_empty() {
-            "would_add".to_string()
+            MutationOutcome::WouldAdd
         } else {
-            "would_remove".to_string()
+            MutationOutcome::WouldRemove
         }
+    } else if !to_add.is_empty() && !to_remove.is_empty() {
+        MutationOutcome::Updated
+    } else if !to_add.is_empty() {
+        MutationOutcome::Added
     } else {
-        if !to_add.is_empty() && !to_remove.is_empty() {
-            "updated".to_string()
-        } else if !to_add.is_empty() {
-            "added".to_string()
-        } else {
-            "removed".to_string()
-        }
+        MutationOutcome::Removed
+    }
+}
+
+fn scope_mutation_summary(
+    outcome: MutationOutcome,
+    client: &str,
+    requested_state: &str,
+    scope_kind: &str,
+    requested_scope_ids: Vec<String>,
+    already_bound: Vec<String>,
+    to_add: Vec<String>,
+    to_remove: Vec<String>,
+    dry_run: bool,
+) -> ScopeMutationSummary {
+    let changed = !to_add.is_empty() || !to_remove.is_empty();
+    ScopeMutationSummary {
+        outcome: outcome.as_str().to_string(),
+        client: client.to_string(),
+        changed,
+        requested_state: requested_state.to_string(),
+        scope_kind: scope_kind.to_string(),
+        requested_scope_ids,
+        already_bound,
+        to_add,
+        to_remove,
+        will_apply: !dry_run && changed,
+        dry_run,
     }
 }
 
@@ -517,17 +643,22 @@ impl KcAdminMcp {
         }
 
         let dry_run = args.dry_run.unwrap_or(false);
-        let will_apply = !dry_run && (!plan.added.is_empty() || !plan.removed.is_empty());
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
-            outcome: mutation_outcome(&plan.added, &plan.removed, dry_run, "already_bound"),
-            scope_kind: scope_kind_label(ScopeKind::Default).to_string(),
-            requested_scope_ids: plan.requested,
-            already_bound: plan.already_bound,
-            to_add: plan.added,
-            to_remove: plan.removed,
-            will_apply,
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
+            mutation_outcome(
+                &plan.added,
+                &plan.removed,
+                dry_run,
+                MutationOutcome::AlreadyBound,
+            ),
+            &client_id,
+            "bound",
+            scope_kind_label(ScopeKind::Default),
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
             dry_run,
-        })))
+        ))))
     }
 
     /// Remove one or more default client scopes from a client.
@@ -613,17 +744,22 @@ impl KcAdminMcp {
         }
 
         let dry_run = args.dry_run.unwrap_or(false);
-        let will_apply = !dry_run && (!plan.added.is_empty() || !plan.removed.is_empty());
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
-            outcome: mutation_outcome(&plan.added, &plan.removed, dry_run, "already_unbound"),
-            scope_kind: scope_kind_label(ScopeKind::Default).to_string(),
-            requested_scope_ids: plan.requested,
-            already_bound: plan.already_bound,
-            to_add: plan.added,
-            to_remove: plan.removed,
-            will_apply,
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
+            mutation_outcome(
+                &plan.added,
+                &plan.removed,
+                dry_run,
+                MutationOutcome::AlreadyUnbound,
+            ),
+            &client_id,
+            "unbound",
+            scope_kind_label(ScopeKind::Default),
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
             dry_run,
-        })))
+        ))))
     }
 
     /// Attach one or more optional client scopes to a client.
@@ -710,17 +846,22 @@ impl KcAdminMcp {
         }
 
         let dry_run = args.dry_run.unwrap_or(false);
-        let will_apply = !dry_run && (!plan.added.is_empty() || !plan.removed.is_empty());
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
-            outcome: mutation_outcome(&plan.added, &plan.removed, dry_run, "already_bound"),
-            scope_kind: scope_kind_label(ScopeKind::Optional).to_string(),
-            requested_scope_ids: plan.requested,
-            already_bound: plan.already_bound,
-            to_add: plan.added,
-            to_remove: plan.removed,
-            will_apply,
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
+            mutation_outcome(
+                &plan.added,
+                &plan.removed,
+                dry_run,
+                MutationOutcome::AlreadyBound,
+            ),
+            &client_id,
+            "bound",
+            scope_kind_label(ScopeKind::Optional),
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
             dry_run,
-        })))
+        ))))
     }
 
     /// Remove one or more optional client scopes from a client.
@@ -807,17 +948,22 @@ impl KcAdminMcp {
         }
 
         let dry_run = args.dry_run.unwrap_or(false);
-        let will_apply = !dry_run && (!plan.added.is_empty() || !plan.removed.is_empty());
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
-            outcome: mutation_outcome(&plan.added, &plan.removed, dry_run, "already_unbound"),
-            scope_kind: scope_kind_label(ScopeKind::Optional).to_string(),
-            requested_scope_ids: plan.requested,
-            already_bound: plan.already_bound,
-            to_add: plan.added,
-            to_remove: plan.removed,
-            will_apply,
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
+            mutation_outcome(
+                &plan.added,
+                &plan.removed,
+                dry_run,
+                MutationOutcome::AlreadyUnbound,
+            ),
+            &client_id,
+            "unbound",
+            scope_kind_label(ScopeKind::Optional),
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
             dry_run,
-        })))
+        ))))
     }
 
     /// Check whether a scope is currently bound to a client's default or optional scopes.
@@ -965,7 +1111,7 @@ impl KcAdminMcp {
         if ensure {
             if in_default || in_optional {
                 already_bound.push(scope_id.clone());
-                outcome = "already_bound".to_string();
+                outcome = MutationOutcome::AlreadyBound;
             } else {
                 to_add.push(scope_id.clone());
                 if !dry_run {
@@ -982,13 +1128,13 @@ impl KcAdminMcp {
                     .await?;
                 }
                 outcome = if dry_run {
-                    "would_add".to_string()
+                    MutationOutcome::WouldAdd
                 } else {
-                    "added".to_string()
+                    MutationOutcome::Added
                 };
             }
         } else if !in_default && !in_optional {
-            outcome = "already_unbound".to_string();
+            outcome = MutationOutcome::AlreadyUnbound;
         } else {
             if in_default {
                 to_remove.push(scope_id.clone());
@@ -1025,25 +1171,23 @@ impl KcAdminMcp {
             to_remove.sort_unstable();
             to_remove.dedup();
             outcome = if dry_run {
-                "would_remove".to_string()
+                MutationOutcome::WouldRemove
             } else {
-                "removed".to_string()
+                MutationOutcome::Removed
             };
         }
 
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
             outcome,
-            scope_kind: "default_or_optional".to_string(),
-            requested_scope_ids: vec![scope_id],
+            &client_id,
+            if ensure { "bound" } else { "unbound" },
+            "default_or_optional",
+            vec![scope_id],
             already_bound,
-            will_apply: {
-                let has_changes = !to_add.is_empty() || !to_remove.is_empty();
-                !dry_run && has_changes
-            },
             to_add,
             to_remove,
             dry_run,
-        })))
+        ))))
     }
 
     /// Replace all default client scopes with the provided set.
@@ -1138,8 +1282,6 @@ impl KcAdminMcp {
         let existing_ids =
             existing_client_scopes(self, &ctx, &args.realm, &client_id, ScopeKind::Default).await?;
         let plan = scope_replace_plan(&existing_ids, &resolved.ids);
-        let will_apply = !dry_run && (!plan.added.is_empty() || !plan.removed.is_empty());
-
         for scope_id in plan.removed.iter() {
             validate_no_path_traversal(scope_id, "scope_id")?;
             apply_scope_mutation(
@@ -1170,16 +1312,22 @@ impl KcAdminMcp {
             .await?;
         }
 
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
-            outcome: mutation_outcome(&plan.added, &plan.removed, dry_run, "already_match"),
-            scope_kind: scope_kind_label(ScopeKind::Default).to_string(),
-            requested_scope_ids: plan.requested,
-            already_bound: plan.already_bound,
-            to_add: plan.added,
-            to_remove: plan.removed,
-            will_apply,
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
+            mutation_outcome(
+                &plan.added,
+                &plan.removed,
+                dry_run,
+                MutationOutcome::AlreadyMatch,
+            ),
+            &client_id,
+            "exact_match",
+            scope_kind_label(ScopeKind::Default),
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
             dry_run,
-        })))
+        ))))
     }
 
     /// Replace all optional client scopes with the provided set.
@@ -1275,8 +1423,6 @@ impl KcAdminMcp {
             existing_client_scopes(self, &ctx, &args.realm, &client_id, ScopeKind::Optional)
                 .await?;
         let plan = scope_replace_plan(&existing_ids, &resolved.ids);
-        let will_apply = !dry_run && (!plan.added.is_empty() || !plan.removed.is_empty());
-
         for scope_id in plan.removed.iter() {
             validate_no_path_traversal(scope_id, "scope_id")?;
             apply_scope_mutation(
@@ -1307,15 +1453,21 @@ impl KcAdminMcp {
             .await?;
         }
 
-        Ok(CallToolResult::structured(json!(ScopeMutationSummary {
-            outcome: mutation_outcome(&plan.added, &plan.removed, dry_run, "already_match"),
-            scope_kind: scope_kind_label(ScopeKind::Optional).to_string(),
-            requested_scope_ids: plan.requested,
-            already_bound: plan.already_bound,
-            to_add: plan.added,
-            to_remove: plan.removed,
-            will_apply,
+        Ok(CallToolResult::structured(json!(scope_mutation_summary(
+            mutation_outcome(
+                &plan.added,
+                &plan.removed,
+                dry_run,
+                MutationOutcome::AlreadyMatch,
+            ),
+            &client_id,
+            "exact_match",
+            scope_kind_label(ScopeKind::Optional),
+            plan.requested,
+            plan.already_bound,
+            plan.added,
+            plan.removed,
             dry_run,
-        })))
+        ))))
     }
 }
