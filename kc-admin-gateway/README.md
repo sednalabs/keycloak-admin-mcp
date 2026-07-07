@@ -10,6 +10,8 @@ service token for Keycloak admin calls.
 Required:
 
 - `KC_GATEWAY_ADMIN_BASE_URL` – Keycloak base URL (e.g. `http://127.0.0.1:8080`)
+- `KC_GATEWAY_ADMIN_HOST_HEADER` – optional trusted host override for local Admin REST backends
+- `KC_GATEWAY_ADMIN_FORWARDED_PROTO` – optional trusted forwarded proto override (e.g. `https`)
 - `KC_GATEWAY_INTROSPECTION_URL`
 - `KC_GATEWAY_INTROSPECTION_CLIENT_ID`
 - `KC_GATEWAY_INTROSPECTION_CLIENT_SECRET`
@@ -36,6 +38,8 @@ Optional:
 - `KC_GATEWAY_ACCESS_LOG_FILE` (optional path for access logs)
 - `KC_GATEWAY_AUTH_LOG_FILE` (optional path for auth logs)
 - `KC_GATEWAY_REQUEST_TIMEOUT_MS` (default `5000`)
+- `KC_GATEWAY_ADMIN_HOST_HEADER` (optional; sends trusted `Host`/`X-Forwarded-Host` upstream)
+- `KC_GATEWAY_ADMIN_FORWARDED_PROTO` (optional; sends trusted `X-Forwarded-Proto` upstream)
 - `KC_GATEWAY_INTROSPECTION_AUTH_METHOD` (default `client_secret_basic`)
 - `KC_GATEWAY_EXPECTED_ISSUER` (strict issuer match)
 - `KC_GATEWAY_EXPECTED_AUDIENCE` (strict audience match)

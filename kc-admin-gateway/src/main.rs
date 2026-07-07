@@ -298,6 +298,8 @@ mod tests {
             log_exchange_body: false,
             log_exchange_body_max_bytes: 2048,
             admin_base_url: "http://127.0.0.1:8080".to_string(),
+            admin_host_header: None,
+            admin_forwarded_proto: None,
             introspection_url: "http://127.0.0.1:8080/realms/example-realm/protocol/openid-connect/token/introspect".to_string(),
             introspection_client_id: "gateway-introspect".to_string(),
             introspection_client_secret: "secret".to_string(),
