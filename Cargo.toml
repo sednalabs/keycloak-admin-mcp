@@ -3,9 +3,9 @@ members = ["kc-admin-gateway", "kc-admin-mcp"]
 resolver = "2"
 
 [workspace.dependencies]
-mcp-toolkit-auth = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "64a61f239ff03062024154f7b287fc33d38a6aa3" }
-mcp-toolkit-core = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "64a61f239ff03062024154f7b287fc33d38a6aa3" }
-mcp-toolkit-http = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "64a61f239ff03062024154f7b287fc33d38a6aa3" }
-mcp-toolkit-observability = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "64a61f239ff03062024154f7b287fc33d38a6aa3" }
-mcp-toolkit-policy-core = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "64a61f239ff03062024154f7b287fc33d38a6aa3" }
-mcp-toolkit-testing = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "64a61f239ff03062024154f7b287fc33d38a6aa3" }
+mcp-toolkit-auth = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "a556bcd923c0959e437d03ca9a33f56c484b9151" }
+mcp-toolkit-core = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "a556bcd923c0959e437d03ca9a33f56c484b9151" }
+mcp-toolkit-http = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "a556bcd923c0959e437d03ca9a33f56c484b9151" }
+mcp-toolkit-observability = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "a556bcd923c0959e437d03ca9a33f56c484b9151" }
+mcp-toolkit-policy-core = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "a556bcd923c0959e437d03ca9a33f56c484b9151" }
+mcp-toolkit-testing = { version = "0.1.0", git = "https://github.com/sednalabs/mcp-toolkit-rs", rev = "a556bcd923c0959e437d03ca9a33f56c484b9151" }
