@@ -512,6 +512,7 @@ mod tests {
 
     use crate::test_support::{
         auth_context, build_config, build_server, parts_with_auth, TestServer,
+        UNUSED_KEYCLOAK_BASE_URL,
     };
 
     async fn events_handler(Path(realm): Path<String>) -> Json<serde_json::Value> {
@@ -536,7 +537,7 @@ mod tests {
         let router = axum::Router::new().route("/admin/realms/{realm}/events", get(events_handler));
         let server = TestServer::spawn(router).await;
 
-        let config = build_config(server.base_url.clone(), "http://127.0.0.1:9999".to_string());
+        let config = build_config(server.base_url.clone(), UNUSED_KEYCLOAK_BASE_URL.to_string());
         let mcp = build_server(config);
 
         let ctx = auth_context(mcp.config.scope_map.events.read.clone());
