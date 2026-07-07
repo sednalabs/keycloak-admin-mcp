@@ -19,7 +19,7 @@ futures = "0.3.31"
 schemars = "1.2.0"
 thiserror = "2.0.18"
 uuid = { version = "1.19.0", features = ["v4"] }
-sha2 = "0.10.9"
+sha2 = "0.11.0"
 base64 = "0.22.1"
 regex = "1.12.2"
 time = { version = "0.3.47", features = ["formatting", "parsing"] }
