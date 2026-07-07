@@ -92,6 +92,8 @@ pub struct ClientsSearchArgs {
     pub realm: String,
     pub query: String,
     #[serde(default)]
+    pub exact: Option<bool>,
+    #[serde(default)]
     pub limit: Option<u32>,
 }
 
@@ -774,7 +776,10 @@ struct ClientRoleMappings {
 
 #[derive(Debug, serde::Serialize, JsonSchema)]
 struct ClientSummary {
+    /// Backward-compatible Keycloak internal unique identifier field.
     id: Option<String>,
+    /// Explicit alias for `id` so callers do not confuse it with `client_id`.
+    keycloak_id: Option<String>,
     client_id: Option<String>,
     name: Option<String>,
     enabled: Option<bool>,
@@ -850,8 +855,10 @@ struct PruneSummary {
 
 impl From<ClientRepresentation> for ClientSummary {
     fn from(value: ClientRepresentation) -> Self {
+        let keycloak_id = value.id.clone();
         Self {
             id: value.id,
+            keycloak_id,
             client_id: value.client_id,
             name: value.name,
             enabled: value.enabled,
@@ -1172,14 +1179,32 @@ async fn resolve_client_id(
             .collect(),
         _ => Vec::new(),
     };
-    let found = clients.into_iter().find(|client| {
-        client
-            .client_id
-            .as_ref()
-            .map(|value| value == client_id)
-            .unwrap_or(false)
-    });
-    Ok(found.and_then(|client| client.id))
+    let mut matching_ids: Vec<String> = clients
+        .into_iter()
+        .filter(|client| {
+            client
+                .client_id
+                .as_ref()
+                .map(|value| value == client_id)
+                .unwrap_or(false)
+        })
+        .filter_map(|client| client.id)
+        .collect();
+    matching_ids.sort_unstable();
+    matching_ids.dedup();
+
+    if matching_ids.len() > 1 {
+        return Err(crate::McpError::internal_error(
+            "ambiguous client_id lookup",
+            Some(json!({
+                "client_id": client_id,
+                "matches": matching_ids,
+                "hint": "Retry with id/keycloak_id to select the Keycloak internal unique identifier.",
+            })),
+        ));
+    }
+
+    Ok(matching_ids.into_iter().next())
 }
 
 async fn resolve_scope_ids(
@@ -1397,6 +1422,23 @@ mod tests {
         ]))
     }
 
+    async fn clients_search_handler_exact_client_id(
+        Query(params): Query<HashMap<String, String>>,
+    ) -> Json<serde_json::Value> {
+        assert_eq!(params.get("clientId"), Some(&"agent-ops".to_string()));
+        assert_eq!(params.get("search"), None);
+        Json(json!([
+            {
+                "id": "agent-ops-internal-id",
+                "clientId": "agent-ops",
+            },
+            {
+                "id": "nearby-internal-id",
+                "clientId": "agent-ops-dev",
+            },
+        ]))
+    }
+
     #[tokio::test]
     async fn clients_search_uuid_query_filters_non_exact_hits() {
         let router = axum::Router::new()
@@ -1417,6 +1459,7 @@ mod tests {
         let args = ClientsSearchArgs {
             realm: "test".to_string(),
             query: "123E4567-E89B-12D3-A456-426614174000".to_string(),
+            exact: None,
             limit: Some(20),
         };
 
@@ -1439,6 +1482,10 @@ mod tests {
             results[0]["id"],
             json!("123e4567-e89b-12d3-a456-426614174000")
         );
+        assert_eq!(
+            results[0]["keycloak_id"],
+            json!("123e4567-e89b-12d3-a456-426614174000")
+        );
         assert_eq!(results[0]["client_id"], json!("exact-match"));
 
         server.shutdown();
@@ -1459,6 +1506,7 @@ mod tests {
         let args = ClientsSearchArgs {
             realm: "test".to_string(),
             query: "service".to_string(),
+            exact: None,
             limit: Some(10),
         };
 
@@ -1485,6 +1533,42 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn clients_search_exact_client_id_uses_exact_lookup() {
+        let router = axum::Router::new().route(
+            "/admin/realms/test/clients",
+            get(clients_search_handler_exact_client_id),
+        );
+        let server = TestServer::spawn(router).await;
+
+        let config = build_config(server.base_url.clone(), "http://127.0.0.1:9999".to_string());
+        let mcp = build_server(config);
+        let ctx = auth_context(mcp.config.scope_map.clients.read.clone());
+        let parts = parts_with_auth(ctx);
+        let args = ClientsSearchArgs {
+            realm: "test".to_string(),
+            query: "agent-ops".to_string(),
+            exact: Some(true),
+            limit: Some(10),
+        };
+
+        let result = mcp
+            .clients_search(Parameters(args), Extension(parts))
+            .await
+            .expect("clients search result");
+        let structured = result.structured_content.expect("structured content");
+        let results = structured
+            .get("results")
+            .and_then(|value| value.as_array())
+            .expect("results array");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0]["id"], json!("agent-ops-internal-id"));
+        assert_eq!(results[0]["keycloak_id"], json!("agent-ops-internal-id"));
+        assert_eq!(results[0]["client_id"], json!("agent-ops"));
+
+        server.shutdown();
+    }
+
+    #[tokio::test]
     async fn clients_search_uuid_query_is_canonicalized_for_lookup() {
         let router = axum::Router::new()
             .route(
@@ -1504,6 +1588,7 @@ mod tests {
         let args = ClientsSearchArgs {
             realm: "test".to_string(),
             query: "123E4567-E89B-12D3-A456-426614174000".to_string(),
+            exact: None,
             limit: Some(20),
         };
 
