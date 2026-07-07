@@ -264,74 +264,47 @@ impl ServerHandler for KcAdminMcp {
 
         // Logging Schema
         let schema = logging_schema();
-        let schema_size = serde_json::to_string(&schema).map(|s| s.len() as u32).ok();
-        resources.push(Resource::new(
-            mcp_toolkit_core::rmcp::model::RawResource {
-                uri: LOGGING_SCHEMA_URI.to_string(),
-                name: "kc-admin-logging-schema".to_string(),
-                title: Some("KC Admin MCP logging schema".to_string()),
-                description: Some(
-                    "Event names and payload shapes emitted via MCP logging notifications."
-                        .to_string(),
-                ),
-                mime_type: Some("application/json".to_string()),
-                size: schema_size,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        let schema_size = serde_json::to_string(&schema).map(|s| s.len() as u64).ok();
+        let mut logging_schema_resource =
+            Resource::new(LOGGING_SCHEMA_URI, "kc-admin-logging-schema")
+                .with_title("KC Admin MCP logging schema")
+                .with_description(
+                    "Event names and payload shapes emitted via MCP logging notifications.",
+                )
+                .with_mime_type("application/json");
+        if let Some(size) = schema_size {
+            logging_schema_resource = logging_schema_resource.with_size(size);
+        }
+        resources.push(logging_schema_resource);
 
         // Tool Bundles
         let bundles_size = serde_json::to_string(&TOOL_BUNDLES)
-            .map(|s| s.len() as u32)
+            .map(|s| s.len() as u64)
             .ok();
-        resources.push(Resource::new(
-            mcp_toolkit_core::rmcp::model::RawResource {
-                uri: TOOL_BUNDLES_URI.to_string(),
-                name: "kc-admin-tool-bundles".to_string(),
-                title: Some("KC Admin Tool Bundles".to_string()),
-                description: Some(
-                    "Logical grouping of tools for dynamic injection and least-privilege discovery."
-                        .to_string(),
-                ),
-                mime_type: Some("application/json".to_string()),
-                size: bundles_size,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        let mut tool_bundles_resource = Resource::new(TOOL_BUNDLES_URI, "kc-admin-tool-bundles")
+            .with_title("KC Admin Tool Bundles")
+            .with_description(
+                "Logical grouping of tools for dynamic injection and least-privilege discovery.",
+            )
+            .with_mime_type("application/json");
+        if let Some(size) = bundles_size {
+            tool_bundles_resource = tool_bundles_resource.with_size(size);
+        }
+        resources.push(tool_bundles_resource);
 
-        resources.push(Resource::new(
-            mcp_toolkit_core::rmcp::model::RawResource {
-                uri: STATUS_URI.to_string(),
-                name: "kc-admin-status".to_string(),
-                title: Some("KC Admin MCP status".to_string()),
-                description: Some("Server status and runtime provenance (JSON).".to_string()),
-                mime_type: Some("application/json".to_string()),
-                size: None,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        resources.push(
+            Resource::new(STATUS_URI, "kc-admin-status")
+                .with_title("KC Admin MCP status")
+                .with_description("Server status and runtime provenance (JSON).")
+                .with_mime_type("application/json"),
+        );
 
-        resources.push(Resource::new(
-            mcp_toolkit_core::rmcp::model::RawResource {
-                uri: ATTEST_URI.to_string(),
-                name: "kc-admin-attest".to_string(),
-                title: Some("KC Admin MCP attestation".to_string()),
-                description: Some(
-                    "Fleet v2 attestation envelope for this running server.".to_string(),
-                ),
-                mime_type: Some("application/json".to_string()),
-                size: None,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        resources.push(
+            Resource::new(ATTEST_URI, "kc-admin-attest")
+                .with_title("KC Admin MCP attestation")
+                .with_description("Fleet v2 attestation envelope for this running server.")
+                .with_mime_type("application/json"),
+        );
 
         std::future::ready(Ok(ListResourcesResult {
             resources,

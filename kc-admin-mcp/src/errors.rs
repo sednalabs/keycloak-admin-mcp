@@ -7,7 +7,7 @@
 //! reason about (e.g. `clients.not_found`). It also ensures that request IDs
 //! are propagated back to the client for troubleshooting.
 
-use mcp_toolkit_core::rmcp::model::{CallToolResult, Content};
+use mcp_toolkit_core::rmcp::model::{CallToolResult, ContentBlock};
 use serde_json::json;
 use serde_json::Value;
 
@@ -169,5 +169,5 @@ pub fn tool_error_with_context_and_hint(
 /// # Caveats
 /// * None.
 pub fn tool_text_result(message: &str) -> CallToolResult {
-    CallToolResult::success(vec![Content::text(message)])
+    CallToolResult::success(vec![ContentBlock::text(message)])
 }
