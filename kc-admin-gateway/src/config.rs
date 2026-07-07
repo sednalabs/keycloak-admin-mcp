@@ -54,6 +54,8 @@ pub struct GatewayConfig {
     pub log_exchange_body: bool,
     pub log_exchange_body_max_bytes: usize,
     pub admin_base_url: String,
+    pub admin_host_header: Option<String>,
+    pub admin_forwarded_proto: Option<String>,
     pub introspection_url: String,
     pub introspection_client_id: String,
     pub introspection_client_secret: String,
@@ -211,6 +213,8 @@ pub fn load_config() -> GatewayConfig {
         log_exchange_body: env_bool("KC_GATEWAY_LOG_EXCHANGE_BODY", false),
         log_exchange_body_max_bytes: env_usize("KC_GATEWAY_LOG_EXCHANGE_BODY_MAX_BYTES", 2048),
         admin_base_url: env("KC_GATEWAY_ADMIN_BASE_URL", ""),
+        admin_host_header: env_optional("KC_GATEWAY_ADMIN_HOST_HEADER"),
+        admin_forwarded_proto: env_optional("KC_GATEWAY_ADMIN_FORWARDED_PROTO"),
         introspection_url: env("KC_GATEWAY_INTROSPECTION_URL", ""),
         introspection_client_id: env("KC_GATEWAY_INTROSPECTION_CLIENT_ID", ""),
         introspection_client_secret: env_secret(

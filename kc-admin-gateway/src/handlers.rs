@@ -19,7 +19,10 @@ use std::sync::Arc;
 
 use axum::body::{Body, Bytes};
 use axum::extract::State;
-use axum::http::{header::AUTHORIZATION, HeaderMap, Method, Request, Response, StatusCode};
+use axum::http::{
+    header::{AUTHORIZATION, HOST},
+    HeaderMap, Method, Request, Response, StatusCode,
+};
 use axum::response::IntoResponse;
 use axum::Json;
 use mcp_toolkit_auth::Authenticator;
@@ -131,6 +134,7 @@ pub async fn proxy_admin(State(state): State<Arc<AppState>>, req: Request<Body>)
     .await
     {
         Ok((response, audit)) => {
+            let upstream_failed = is_failure_status(response.status());
             log_request_finish(
                 "admin_proxy",
                 method.as_str(),
@@ -141,15 +145,25 @@ pub async fn proxy_admin(State(state): State<Arc<AppState>>, req: Request<Body>)
                 session_id.as_deref(),
                 request_started,
                 response.status().as_u16(),
-                false,
+                upstream_failed,
             );
-            audit_log_success(
-                &response,
-                &request_id,
-                actor_id.as_deref(),
-                session_id.as_deref(),
-                audit.as_ref(),
-            );
+            if upstream_failed {
+                audit_log_upstream_failure(
+                    &response,
+                    &request_id,
+                    actor_id.as_deref(),
+                    session_id.as_deref(),
+                    audit.as_ref(),
+                );
+            } else {
+                audit_log_success(
+                    &response,
+                    &request_id,
+                    actor_id.as_deref(),
+                    session_id.as_deref(),
+                    audit.as_ref(),
+                );
+            }
             response
         }
         Err((err, audit)) => {
@@ -529,6 +543,8 @@ async fn handle_proxy(
         )
         .header("x-request-id", request_id);
 
+    upstream = apply_admin_origin_headers(upstream, &state.config);
+
     if let Some(actor_id) = actor_id {
         upstream = upstream.header("x-actor-id", actor_id);
     }
@@ -551,6 +567,11 @@ async fn handle_proxy(
     ))
 }
 
+/// Return whether an upstream response should be logged as failed.
+fn is_failure_status(status: StatusCode) -> bool {
+    status.is_client_error() || status.is_server_error()
+}
+
 /// Format a JSON error response for gateway failures.
 fn error_response(err: &GatewayError, request_id: &str) -> Response<Body> {
     let status =
@@ -563,6 +584,39 @@ fn error_response(err: &GatewayError, request_id: &str) -> Response<Body> {
     let mut response = payload.into_response();
     *response.status_mut() = status;
     response
+}
+
+/// Emit audit/log entries for proxied requests rejected by Keycloak Admin REST.
+fn audit_log_upstream_failure(
+    response: &Response<Body>,
+    request_id: &str,
+    actor_id: Option<&str>,
+    session_id: Option<&str>,
+    audit: Option<&AuditIdentity>,
+) {
+    if let Some(audit) = audit {
+        tracing::warn!(
+            target: crate::logging::LOG_TARGET_ACCESS,
+            request_id = %request_id,
+            actor_id = actor_id.unwrap_or("unknown"),
+            session_id = session_id.unwrap_or("unknown"),
+            subject_hash = audit.subject_hash.as_deref().unwrap_or("unknown"),
+            client_id_hash = audit.client_id_hash.as_deref().unwrap_or("unknown"),
+            azp_hash = audit.azp_hash.as_deref().unwrap_or("unknown"),
+            status = %response.status(),
+            "admin upstream request failed"
+        );
+        return;
+    }
+
+    tracing::warn!(
+        target: crate::logging::LOG_TARGET_ACCESS,
+        request_id = %request_id,
+        actor_id = actor_id.unwrap_or("unknown"),
+        session_id = session_id.unwrap_or("unknown"),
+        status = %response.status(),
+        "admin upstream request failed"
+    );
 }
 
 /// Emit audit/log entries for successfully proxied requests.
@@ -790,8 +844,39 @@ fn should_forward_header(name: &str) -> bool {
     let name = name.to_ascii_lowercase();
     !matches!(
         name.as_str(),
-        "authorization" | "host" | "content-length" | "connection" | "transfer-encoding"
+        "authorization"
+            | "host"
+            | "forwarded"
+            | "x-forwarded-host"
+            | "x-forwarded-port"
+            | "x-forwarded-proto"
+            | "x-forwarded-server"
+            | "x-forwarded-ssl"
+            | "content-length"
+            | "connection"
+            | "transfer-encoding"
     )
+}
+
+/// Apply trusted admin-origin overrides for local Keycloak backends.
+///
+/// The gateway may connect to a private transport URL (for example localhost) while Keycloak
+/// expects bearer tokens issued for its canonical public origin. Only configured values are
+/// applied here; caller-supplied forwarded host/proto headers are stripped by
+/// `should_forward_header`.
+fn apply_admin_origin_headers(
+    mut upstream: reqwest::RequestBuilder,
+    config: &GatewayConfig,
+) -> reqwest::RequestBuilder {
+    if let Some(host) = config.admin_host_header.as_deref() {
+        upstream = upstream.header(HOST, host).header("x-forwarded-host", host);
+    }
+
+    if let Some(proto) = config.admin_forwarded_proto.as_deref() {
+        upstream = upstream.header("x-forwarded-proto", proto);
+    }
+
+    upstream
 }
 
 /// Build the upstream Keycloak URL for the MCP request path.
@@ -1140,7 +1225,7 @@ mod tests {
 
     use super::{
         azp_allowlist_break_glass_expired, contains_matrix_params, is_allowlisted_admin_path,
-        path_segments, required_scopes,
+        is_failure_status, path_segments, required_scopes, should_forward_header,
     };
     use crate::config::{ClientAuthMethod, GatewayConfig};
 
@@ -1159,6 +1244,8 @@ mod tests {
             log_exchange_body: false,
             log_exchange_body_max_bytes: 2048,
             admin_base_url: "http://keycloak.test".to_string(),
+            admin_host_header: None,
+            admin_forwarded_proto: None,
             introspection_url: "http://keycloak.test/introspect".to_string(),
             introspection_client_id: "gateway-introspect".to_string(),
             introspection_client_secret: "secret".to_string(),
@@ -1195,6 +1282,28 @@ mod tests {
         let config = gateway_config_for_break_glass();
 
         assert!(azp_allowlist_break_glass_expired(&config));
+    }
+
+    #[test]
+    fn logs_upstream_error_statuses_as_failures() {
+        assert!(!is_failure_status(axum::http::StatusCode::OK));
+        assert!(!is_failure_status(axum::http::StatusCode::NO_CONTENT));
+        assert!(is_failure_status(axum::http::StatusCode::UNAUTHORIZED));
+        assert!(is_failure_status(axum::http::StatusCode::FORBIDDEN));
+        assert!(is_failure_status(axum::http::StatusCode::NOT_FOUND));
+        assert!(is_failure_status(axum::http::StatusCode::BAD_GATEWAY));
+    }
+
+    #[test]
+    fn does_not_forward_caller_origin_authority_headers() {
+        assert!(!should_forward_header("authorization"));
+        assert!(!should_forward_header("host"));
+        assert!(!should_forward_header("forwarded"));
+        assert!(!should_forward_header("x-forwarded-host"));
+        assert!(!should_forward_header("x-forwarded-proto"));
+        assert!(!should_forward_header("x-forwarded-port"));
+        assert!(should_forward_header("x-request-id"));
+        assert!(should_forward_header("content-type"));
     }
 
     #[test]
