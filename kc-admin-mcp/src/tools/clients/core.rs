@@ -95,7 +95,12 @@ impl KcAdminMcp {
             return Ok(err);
         }
 
-        let mut query_params = vec![("search".to_string(), query.to_string())];
+        let exact = args.exact.unwrap_or(false);
+        let mut query_params = if exact {
+            vec![("clientId".to_string(), query.to_string())]
+        } else {
+            vec![("search".to_string(), query.to_string())]
+        };
         if let Some(limit) = args.limit {
             if limit == 0 || limit > 100 {
                 return Ok(tool_error_with_context(
@@ -179,7 +184,7 @@ impl KcAdminMcp {
                 clients.push(client);
             }
         }
-        if exact_uuid_match {
+        if exact || exact_uuid_match {
             let normalized_query = query.to_ascii_lowercase();
             clients.retain(|client| {
                 client
