@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_clients_mappers, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_clients_mappers, vis = "pub")]
 impl KcAdminMcp {
     /// List protocol mappers for a client.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.

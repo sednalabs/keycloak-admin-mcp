@@ -22,15 +22,15 @@ use mcp_toolkit_core::{
     notifications::{ToolListTracker, ToolListUpdate},
     rmcp_models,
 };
-use rmcp::handler::server::router::tool::ToolRouter;
-use rmcp::handler::server::tool::ToolCallContext;
-use rmcp::model::{
+use mcp_toolkit_core::rmcp::handler::server::router::tool::ToolRouter;
+use mcp_toolkit_core::rmcp::handler::server::tool::ToolCallContext;
+use mcp_toolkit_core::rmcp::model::{
     CallToolRequestParams, CallToolResult, Implementation, ListResourcesResult, ListToolsResult,
     PaginatedRequestParams, ProtocolVersion, ReadResourceRequestParams, ReadResourceResult,
     Resource, ResourceContents, ServerCapabilities, ServerInfo,
 };
-use rmcp::service::RequestContext;
-use rmcp::{RoleServer, ServerHandler};
+use mcp_toolkit_core::rmcp::service::RequestContext;
+use mcp_toolkit_core::rmcp::{RoleServer, ServerHandler};
 use std::future::Future;
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
@@ -44,7 +44,7 @@ use crate::logging::LOG_TARGET_ACCESS;
 use crate::metrics::Metrics;
 use crate::provenance::{build_attestation_envelope, RuntimeAdmissionExtension, RuntimeProvenance};
 use axum::http::request::Parts;
-use rmcp::ErrorData;
+use mcp_toolkit_core::rmcp::ErrorData;
 
 use crate::tools::bundles::TOOL_BUNDLES;
 
@@ -119,7 +119,7 @@ impl KcAdminMcp {
         }
     }
 
-    fn effective_tools(&self) -> Vec<rmcp::model::Tool> {
+    fn effective_tools(&self) -> Vec<mcp_toolkit_core::rmcp::model::Tool> {
         let mut tools = self.tool_router.list_all();
         if !self.config.enable_secret_tools {
             tools.retain(|tool| !tool.name.starts_with("clients.secrets."));
@@ -130,7 +130,7 @@ impl KcAdminMcp {
     async fn maybe_notify_tool_list_changed(
         &self,
         session_id: Option<&str>,
-        peer: &rmcp::service::Peer<RoleServer>,
+        peer: &mcp_toolkit_core::rmcp::service::Peer<RoleServer>,
     ) {
         let session_id = session_id.map(str::trim).filter(|value| !value.is_empty());
         let Some(session_id) = session_id else {
@@ -168,7 +168,7 @@ impl ServerHandler for KcAdminMcp {
         &self,
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
-    ) -> impl Future<Output = Result<ListToolsResult, rmcp::ErrorData>> + Send + '_ {
+    ) -> impl Future<Output = Result<ListToolsResult, mcp_toolkit_core::rmcp::ErrorData>> + Send + '_ {
         let tools = self.effective_tools();
         if let Some(session_id) = log_context::current().and_then(|ctx| ctx.session_id) {
             let _ = self
@@ -191,7 +191,7 @@ impl ServerHandler for KcAdminMcp {
         &self,
         request: CallToolRequestParams,
         context: RequestContext<RoleServer>,
-    ) -> impl Future<Output = Result<CallToolResult, rmcp::ErrorData>> + Send + '_ {
+    ) -> impl Future<Output = Result<CallToolResult, mcp_toolkit_core::rmcp::ErrorData>> + Send + '_ {
         let start = Instant::now();
         let tool_name = request.name.to_string();
         let metrics = self.metrics.clone();
@@ -259,79 +259,52 @@ impl ServerHandler for KcAdminMcp {
         &self,
         _request: Option<PaginatedRequestParams>,
         _context: RequestContext<RoleServer>,
-    ) -> impl Future<Output = Result<ListResourcesResult, rmcp::ErrorData>> + Send + '_ {
+    ) -> impl Future<Output = Result<ListResourcesResult, mcp_toolkit_core::rmcp::ErrorData>> + Send + '_ {
         let mut resources = Vec::new();
 
         // Logging Schema
         let schema = logging_schema();
-        let schema_size = serde_json::to_string(&schema).map(|s| s.len() as u32).ok();
-        resources.push(Resource::new(
-            rmcp::model::RawResource {
-                uri: LOGGING_SCHEMA_URI.to_string(),
-                name: "kc-admin-logging-schema".to_string(),
-                title: Some("KC Admin MCP logging schema".to_string()),
-                description: Some(
-                    "Event names and payload shapes emitted via MCP logging notifications."
-                        .to_string(),
-                ),
-                mime_type: Some("application/json".to_string()),
-                size: schema_size,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        let schema_size = serde_json::to_string(&schema).map(|s| s.len() as u64).ok();
+        let mut logging_schema_resource =
+            Resource::new(LOGGING_SCHEMA_URI, "kc-admin-logging-schema")
+                .with_title("KC Admin MCP logging schema")
+                .with_description(
+                    "Event names and payload shapes emitted via MCP logging notifications.",
+                )
+                .with_mime_type("application/json");
+        if let Some(size) = schema_size {
+            logging_schema_resource = logging_schema_resource.with_size(size);
+        }
+        resources.push(logging_schema_resource);
 
         // Tool Bundles
         let bundles_size = serde_json::to_string(&TOOL_BUNDLES)
-            .map(|s| s.len() as u32)
+            .map(|s| s.len() as u64)
             .ok();
-        resources.push(Resource::new(
-            rmcp::model::RawResource {
-                uri: TOOL_BUNDLES_URI.to_string(),
-                name: "kc-admin-tool-bundles".to_string(),
-                title: Some("KC Admin Tool Bundles".to_string()),
-                description: Some(
-                    "Logical grouping of tools for dynamic injection and least-privilege discovery."
-                        .to_string(),
-                ),
-                mime_type: Some("application/json".to_string()),
-                size: bundles_size,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        let mut tool_bundles_resource = Resource::new(TOOL_BUNDLES_URI, "kc-admin-tool-bundles")
+            .with_title("KC Admin Tool Bundles")
+            .with_description(
+                "Logical grouping of tools for dynamic injection and least-privilege discovery.",
+            )
+            .with_mime_type("application/json");
+        if let Some(size) = bundles_size {
+            tool_bundles_resource = tool_bundles_resource.with_size(size);
+        }
+        resources.push(tool_bundles_resource);
 
-        resources.push(Resource::new(
-            rmcp::model::RawResource {
-                uri: STATUS_URI.to_string(),
-                name: "kc-admin-status".to_string(),
-                title: Some("KC Admin MCP status".to_string()),
-                description: Some("Server status and runtime provenance (JSON).".to_string()),
-                mime_type: Some("application/json".to_string()),
-                size: None,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        resources.push(
+            Resource::new(STATUS_URI, "kc-admin-status")
+                .with_title("KC Admin MCP status")
+                .with_description("Server status and runtime provenance (JSON).")
+                .with_mime_type("application/json"),
+        );
 
-        resources.push(Resource::new(
-            rmcp::model::RawResource {
-                uri: ATTEST_URI.to_string(),
-                name: "kc-admin-attest".to_string(),
-                title: Some("KC Admin MCP attestation".to_string()),
-                description: Some(
-                    "Fleet v2 attestation envelope for this running server.".to_string(),
-                ),
-                mime_type: Some("application/json".to_string()),
-                size: None,
-                icons: None,
-                meta: None,
-            },
-            None,
-        ));
+        resources.push(
+            Resource::new(ATTEST_URI, "kc-admin-attest")
+                .with_title("KC Admin MCP attestation")
+                .with_description("Fleet v2 attestation envelope for this running server.")
+                .with_mime_type("application/json"),
+        );
 
         std::future::ready(Ok(ListResourcesResult {
             resources,
@@ -345,7 +318,7 @@ impl ServerHandler for KcAdminMcp {
         &self,
         request: ReadResourceRequestParams,
         _context: RequestContext<RoleServer>,
-    ) -> impl Future<Output = Result<ReadResourceResult, rmcp::ErrorData>> + Send + '_ {
+    ) -> impl Future<Output = Result<ReadResourceResult, mcp_toolkit_core::rmcp::ErrorData>> + Send + '_ {
         let (uri, text) = match request.uri.as_str() {
             LOGGING_SCHEMA_URI => {
                 let schema = logging_schema();

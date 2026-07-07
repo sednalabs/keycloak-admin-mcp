@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_clients_secrets, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_clients_secrets, vis = "pub")]
 impl KcAdminMcp {
     /// Fetch a client secret.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.

@@ -61,10 +61,10 @@ use mcp_toolkit_http::session::{
     BoundedSessionManager, EventStore, EventStoreConfig, RecordingSessionManager,
 };
 use mcp_toolkit_observability::sanitize_log_value;
-use rmcp::transport::common::http_header::{
+use mcp_toolkit_core::rmcp::transport::common::http_header::{
     EVENT_STREAM_MIME_TYPE, HEADER_LAST_EVENT_ID, HEADER_SESSION_ID,
 };
-use rmcp::transport::streamable_http_server::{
+use mcp_toolkit_core::rmcp::transport::streamable_http_server::{
     session::local::{LocalSessionManager, SessionConfig},
     session::SessionManager,
     StreamableHttpServerConfig, StreamableHttpService,
@@ -84,7 +84,7 @@ use crate::metrics::Metrics;
 use crate::provenance::{capture_runtime_provenance, RuntimeAdmissionExtension, RuntimeProvenance};
 use crate::server::KcAdminMcp;
 
-pub type McpError = rmcp::ErrorData;
+pub type McpError = mcp_toolkit_core::rmcp::ErrorData;
 
 #[derive(Clone)]
 struct AppState {

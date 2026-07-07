@@ -1,11 +1,11 @@
 use axum::http::request::Parts;
 use axum::http::Method;
 use regex::Regex;
-use rmcp::handler::server::tool::Extension;
-use rmcp::handler::server::wrapper::Parameters;
-use rmcp::model::CallToolResult;
-use rmcp::tool;
-use rmcp::tool_router;
+use mcp_toolkit_core::rmcp::handler::server::tool::Extension;
+use mcp_toolkit_core::rmcp::handler::server::wrapper::Parameters;
+use mcp_toolkit_core::rmcp::model::CallToolResult;
+use mcp_toolkit_core::rmcp::tool;
+use mcp_toolkit_core::rmcp::tool_router;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde_json::json;
@@ -555,8 +555,8 @@ mod tests {
 
         let result = mcp
             .events_list(
-                rmcp::handler::server::wrapper::Parameters(args),
-                rmcp::handler::server::tool::Extension(parts),
+                mcp_toolkit_core::rmcp::handler::server::wrapper::Parameters(args),
+                mcp_toolkit_core::rmcp::handler::server::tool::Extension(parts),
             )
             .await
             .expect("events list result");

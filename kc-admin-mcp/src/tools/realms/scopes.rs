@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_realms_scopes, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_realms_scopes, vis = "pub")]
 impl KcAdminMcp {
     /// List default or optional client scopes for a realm.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.

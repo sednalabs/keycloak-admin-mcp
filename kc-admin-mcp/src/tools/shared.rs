@@ -16,7 +16,7 @@ use axum::http::request::Parts;
 use crate::auth::AuthContext;
 use crate::config::{Config, ScopeMap};
 use crate::errors::{tool_error, tool_error_with_hint};
-use rmcp::model::CallToolResult;
+use mcp_toolkit_core::rmcp::model::CallToolResult;
 
 /// Extract the authenticated context saved in the request extensions by `auth_guard`.
 ///
