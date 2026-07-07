@@ -26,6 +26,8 @@ pub(crate) struct TestServer {
     shutdown: Option<oneshot::Sender<()>>,
 }
 
+pub(crate) const UNUSED_KEYCLOAK_BASE_URL: &str = "https://keycloak.invalid";
+
 impl TestServer {
     pub(crate) async fn spawn(router: Router) -> Self {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
@@ -59,13 +61,13 @@ pub(crate) fn build_config(gateway_url: String, keycloak_url: String) -> Config 
     let scopes_supported = collect_scopes(&scope_map);
     let auth = AuthConfig {
         mode: AuthMode::Introspection,
-        issuer: Some("http://issuer.test".to_string()),
+        issuer: Some("https://issuer.test".to_string()),
         audience: Some("http://kc-admin-mcp.test".to_string()),
         allowed_azp: Vec::new(),
         allowed_client_ids: Vec::new(),
         open_caller_allowlists_expires_at: None,
         clock_skew_seconds: 30,
-        introspection_url: "http://issuer.test/introspect".to_string(),
+        introspection_url: "https://issuer.test/introspect".to_string(),
         introspection_client_id: "kc-admin-mcp".to_string(),
         introspection_client_secret: "kc-admin-mcp-secret".to_string(),
         introspection_auth_method: ClientAuthMethod::ClientSecretBasic,
@@ -81,7 +83,7 @@ pub(crate) fn build_config(gateway_url: String, keycloak_url: String) -> Config 
         resource_url: "http://127.0.0.1:0/mcp".to_string(),
         resource_metadata_url: "http://127.0.0.1:0/.well-known/oauth-protected-resource/mcp"
             .to_string(),
-        authorization_servers: vec!["http://issuer.test".to_string()],
+        authorization_servers: vec!["https://issuer.test".to_string()],
         scopes_supported,
         scope_map,
         role_requirements: RoleRequirements {
@@ -182,7 +184,7 @@ pub(crate) fn auth_context(scopes: Vec<String>) -> AuthContext {
         ],
         expires_at: None,
         azp: Some("client-test".to_string()),
-        issuer: Some("http://issuer.test".to_string()),
+        issuer: Some("https://issuer.test".to_string()),
     }
 }
 
