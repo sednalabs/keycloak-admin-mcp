@@ -7,7 +7,7 @@
 //! reason about (e.g. `clients.not_found`). It also ensures that request IDs
 //! are propagated back to the client for troubleshooting.
 
-use rmcp::model::{CallToolResult, Content};
+use mcp_toolkit_core::rmcp::model::{CallToolResult, Content};
 use serde_json::json;
 use serde_json::Value;
 

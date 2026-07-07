@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_realms_events, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_realms_events, vis = "pub")]
 impl KcAdminMcp {
     /// Get realm events configuration.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.

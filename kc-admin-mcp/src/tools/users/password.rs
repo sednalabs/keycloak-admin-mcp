@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_users_password, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_users_password, vis = "pub")]
 impl KcAdminMcp {
     /// Reset a user's password.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.

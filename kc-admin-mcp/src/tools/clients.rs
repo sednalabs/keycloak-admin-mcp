@@ -18,11 +18,11 @@ use std::collections::{HashMap, HashSet};
 
 use axum::http::request::Parts;
 use axum::http::Method;
-use rmcp::handler::server::router::tool::ToolRouter;
-use rmcp::handler::server::tool::Extension;
-use rmcp::handler::server::wrapper::Parameters;
-use rmcp::model::CallToolResult;
-use rmcp::tool;
+use mcp_toolkit_core::rmcp::handler::server::router::tool::ToolRouter;
+use mcp_toolkit_core::rmcp::handler::server::tool::Extension;
+use mcp_toolkit_core::rmcp::handler::server::wrapper::Parameters;
+use mcp_toolkit_core::rmcp::model::CallToolResult;
+use mcp_toolkit_core::rmcp::tool;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use serde_json::json;

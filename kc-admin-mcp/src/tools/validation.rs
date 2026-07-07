@@ -11,7 +11,7 @@
 //! * **Format Strictness**: Enforces UUID and alphanumeric-only patterns for IDs and names.
 
 use regex::Regex;
-use rmcp::model::ErrorCode;
+use mcp_toolkit_core::rmcp::model::ErrorCode;
 use std::sync::OnceLock;
 use uuid::Uuid;
 

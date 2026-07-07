@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_users_core, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_users_core, vis = "pub")]
 impl KcAdminMcp {
     /// List users within a realm.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.

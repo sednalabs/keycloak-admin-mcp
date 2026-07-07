@@ -1,6 +1,6 @@
 use super::*;
 
-#[rmcp::tool_router(router = tool_router_users_groups, vis = "pub")]
+#[mcp_toolkit_core::rmcp::tool_router(router = tool_router_users_groups, vis = "pub")]
 impl KcAdminMcp {
     /// List group memberships for a user.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.
