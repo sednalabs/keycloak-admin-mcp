@@ -69,6 +69,16 @@ jobs:
           install -m 0755 target/release/kc-admin-gateway dist/kc-admin-gateway
           install -m 0755 target/release/kc-admin-mcp dist/kc-admin-mcp
 
+          toolkit_rev="$(
+            sed -n '/name = "mcp-toolkit-core"/,/^\[\[package\]\]/p' Cargo.lock \
+              | sed -n 's/^source = ".*rev=\([0-9a-f]\{40\}\).*$/\1/p' \
+              | head -n 1
+          )"
+          if [[ -z "$toolkit_rev" ]]; then
+            echo "Unable to derive mcp-toolkit-rs revision from Cargo.lock" >&2
+            exit 1
+          fi
+
           (
             cd dist
             sha256sum kc-admin-gateway kc-admin-mcp > SHA256SUMS
@@ -79,7 +89,7 @@ jobs:
               echo "workflow=${{ github.workflow }}"
               echo "run_id=${{ github.run_id }}"
               echo "run_attempt=${{ github.run_attempt }}"
-              echo "toolkit_rev=6a39174efeb40462eecdf8458c8ff41cfac51b52"
+              echo "toolkit_rev=$toolkit_rev"
             } > BUILD_PROVENANCE
           )
 
@@ -88,7 +98,7 @@ jobs:
             echo
             echo "- Repository: ${{ github.repository }}"
             echo "- Commit: ${{ github.sha }}"
-            echo "- Toolkit rev: 6a39174efeb40462eecdf8458c8ff41cfac51b52"
+            echo "- Toolkit rev: $toolkit_rev"
             echo
             echo "#### SHA256"
             echo
