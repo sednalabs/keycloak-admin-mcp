@@ -860,7 +860,7 @@ fn should_forward_header(name: &str) -> bool {
 
 /// Apply trusted admin-origin overrides for local Keycloak backends.
 ///
-/// The gateway may connect to a private transport URL (for example localhost) while Keycloak
+/// The gateway may connect to a private loopback transport address while Keycloak
 /// expects bearer tokens issued for its canonical public origin. Only configured values are
 /// applied here; caller-supplied forwarded host/proto headers are stripped by
 /// `should_forward_header`.
