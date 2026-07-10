@@ -21,9 +21,6 @@ on:
       - "Cargo.toml"
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 concurrency:
   group: kc-admin-mcp-release-artifacts::${{ github.ref }}
   cancel-in-progress: true
@@ -57,8 +54,39 @@ jobs:
       - name: Fetch locked dependencies
         run: cargo fetch --locked
 
+      - name: Install cargo-cyclonedx
+        run: cargo install --locked --version 0.5.9 cargo-cyclonedx
+
       - name: Build release binaries
         run: cargo build --locked --release --bin kc-admin-gateway --bin kc-admin-mcp
+
+      - name: Generate target-specific CycloneDX SBOMs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          target="x86_64-unknown-linux-gnu"
+          mkdir -p dist
+
+          generate_sbom() {
+            local crate_name="$1"
+
+            cargo cyclonedx \
+              --manifest-path "${crate_name}/Cargo.toml" \
+              --format json \
+              --spec-version 1.5 \
+              --describe binaries \
+              --no-build-deps \
+              --target "$target" \
+              --target-in-filename
+
+            install -m 0644 \
+              "${crate_name}/${crate_name}_bin_${target}.cdx.json" \
+              "dist/${crate_name}.${target}.cdx.json"
+          }
+
+          generate_sbom kc-admin-gateway
+          generate_sbom kc-admin-mcp
 
       - name: Stage artifacts
         shell: bash
@@ -81,7 +109,6 @@ jobs:
 
           (
             cd dist
-            sha256sum kc-admin-gateway kc-admin-mcp > SHA256SUMS
             {
               echo "repository=${{ github.repository }}"
               echo "ref=${{ github.ref }}"
@@ -90,7 +117,16 @@ jobs:
               echo "run_id=${{ github.run_id }}"
               echo "run_attempt=${{ github.run_attempt }}"
               echo "toolkit_rev=$toolkit_rev"
+              echo "target=x86_64-unknown-linux-gnu"
+              echo "sbom_generator=cargo-cyclonedx@0.5.9"
             } > BUILD_PROVENANCE
+            sha256sum \
+              kc-admin-gateway \
+              kc-admin-mcp \
+              kc-admin-gateway.x86_64-unknown-linux-gnu.cdx.json \
+              kc-admin-mcp.x86_64-unknown-linux-gnu.cdx.json \
+              BUILD_PROVENANCE \
+              > SHA256SUMS
           )
 
           {
@@ -113,3 +149,64 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 14
+
+  attest-artifacts:
+    name: Attest Linux x86_64 artifacts
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: build-artifacts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download same-run artifact bundle
+        # actions/download-artifact v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: keycloak-admin-mcp-linux-x86_64
+          path: dist
+
+      - name: Verify artifact checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -s dist/kc-admin-gateway
+          test -s dist/kc-admin-mcp
+          test -s dist/kc-admin-gateway.x86_64-unknown-linux-gnu.cdx.json
+          test -s dist/kc-admin-mcp.x86_64-unknown-linux-gnu.cdx.json
+          (
+            cd dist
+            sha256sum --check --strict SHA256SUMS
+          )
+
+      - name: Attest kc-admin-gateway build provenance
+        # actions/attest v4.1.1
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        with:
+          subject-path: dist/kc-admin-gateway
+
+      - name: Attest kc-admin-gateway SBOM
+        # actions/attest v4.1.1
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        with:
+          subject-path: dist/kc-admin-gateway
+          sbom-path: dist/kc-admin-gateway.x86_64-unknown-linux-gnu.cdx.json
+
+      - name: Attest kc-admin-mcp build provenance
+        # actions/attest v4.1.1
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        with:
+          subject-path: dist/kc-admin-mcp
+
+      - name: Attest kc-admin-mcp SBOM
+        # actions/attest v4.1.1
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        with:
+          subject-path: dist/kc-admin-mcp
+          sbom-path: dist/kc-admin-mcp.x86_64-unknown-linux-gnu.cdx.json
