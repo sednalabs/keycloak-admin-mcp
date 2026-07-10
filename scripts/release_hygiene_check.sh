@@ -98,7 +98,11 @@ check_main_only_attestation_permissions() {
       inside { print }
     ' <<< "${attestation_job}"
   )"
-  expected_guard=$'      github.ref == '\''refs/heads/main'\'' &&\n      (github.event_name == '\''push'\'' || github.event_name == '\''workflow_dispatch'\'')'
+  expected_guard="$(
+    printf '%s\n%s' \
+      "      github.ref == 'refs/heads/main' &&" \
+      "      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')"
+  )"
 
   if [[ "${actual_guard}" != "${expected_guard}" ]]; then
     fail "attestation job must use the exact main push or main workflow_dispatch guard"
