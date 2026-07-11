@@ -179,6 +179,48 @@ pub struct ClientRegistrationPolicyDeleteArgs {
     pub provider_id: Option<String>,
 }
 
+/// Captures selectors for listing configured client registration policies.
+///
+/// # Errors
+/// * The handler returns an error if the gateway request fails.
+///
+/// # Security
+/// * Reads registration policy configuration through the least-privilege gateway.
+///
+/// # Caveats
+/// * Omitting every selector lists all configured registration policy components.
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ClientRegistrationPolicyListArgs {
+    pub realm: String,
+    #[serde(default)]
+    pub id: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub provider_id: Option<String>,
+}
+
+/// Captures selectors for fetching one configured client registration policy.
+///
+/// # Errors
+/// * The handler returns an error if the gateway request fails.
+///
+/// # Security
+/// * Reads registration policy configuration through the least-privilege gateway.
+///
+/// # Caveats
+/// * Omitting every selector targets the default Allowed Client Scopes provider.
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ClientRegistrationPolicyGetArgs {
+    pub realm: String,
+    #[serde(default)]
+    pub id: Option<String>,
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub provider_id: Option<String>,
+}
+
 /// Client scope category for realm default scopes.
 ///
 /// # Errors
@@ -364,7 +406,7 @@ impl From<ClientScopeRepresentation> for ClientScopeSummary {
 }
 
 #[derive(Debug, Deserialize)]
-struct ClientRegistrationPolicy {
+struct ClientRegistrationPolicyProvider {
     id: Option<String>,
     #[serde(rename = "helpText")]
     help_text: Option<String>,
@@ -413,9 +455,21 @@ struct ClientInitialAccessSummary {
 }
 
 #[derive(Debug, serde::Serialize, JsonSchema)]
-struct ClientRegistrationPolicySummary {
+struct ClientRegistrationPolicyProviderSummary {
     id: Option<String>,
     help_text: Option<String>,
+}
+
+#[derive(Clone, Debug, serde::Serialize, JsonSchema, PartialEq)]
+struct ClientRegistrationPolicySummary {
+    id: Option<String>,
+    name: Option<String>,
+    provider_id: Option<String>,
+    provider_type: Option<String>,
+    parent_id: Option<String>,
+    allowed_scopes: Vec<String>,
+    allow_default_scopes: Option<bool>,
+    config: serde_json::Value,
 }
 
 mod core;
@@ -546,6 +600,92 @@ fn match_registration_policy_components(
     matches
 }
 
+fn registration_policy_config_values(
+    config: &serde_json::Map<String, serde_json::Value>,
+    keys: &[&str],
+) -> Vec<String> {
+    let Some(value) = keys.iter().find_map(|key| config.get(*key)) else {
+        return Vec::new();
+    };
+    match value {
+        serde_json::Value::Array(values) => values
+            .iter()
+            .filter_map(|value| value.as_str().map(ToString::to_string))
+            .collect(),
+        serde_json::Value::String(value) => vec![value.clone()],
+        _ => Vec::new(),
+    }
+}
+
+fn registration_policy_config_bool(
+    config: &serde_json::Map<String, serde_json::Value>,
+    keys: &[&str],
+) -> Option<bool> {
+    let parse_text = |value: &str| {
+        let value = value.trim();
+        if value.eq_ignore_ascii_case("true") {
+            Some(true)
+        } else if value.eq_ignore_ascii_case("false") {
+            Some(false)
+        } else {
+            None
+        }
+    };
+    let value = keys.iter().find_map(|key| config.get(*key))?;
+    match value {
+        serde_json::Value::Bool(value) => Some(*value),
+        serde_json::Value::String(value) => parse_text(value),
+        serde_json::Value::Array(values) => values.first().and_then(|value| match value {
+            serde_json::Value::Bool(value) => Some(*value),
+            serde_json::Value::String(value) => parse_text(value),
+            _ => None,
+        }),
+        _ => None,
+    }
+}
+
+fn summarize_registration_policy_component(
+    component: &serde_json::Value,
+) -> Option<ClientRegistrationPolicySummary> {
+    let object = component.as_object()?;
+    let config = object
+        .get("config")
+        .and_then(serde_json::Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    Some(ClientRegistrationPolicySummary {
+        id: object
+            .get("id")
+            .and_then(serde_json::Value::as_str)
+            .map(ToString::to_string),
+        name: object
+            .get("name")
+            .and_then(serde_json::Value::as_str)
+            .map(ToString::to_string),
+        provider_id: object
+            .get("providerId")
+            .and_then(serde_json::Value::as_str)
+            .map(ToString::to_string),
+        provider_type: object
+            .get("providerType")
+            .and_then(serde_json::Value::as_str)
+            .map(ToString::to_string),
+        parent_id: object
+            .get("parentId")
+            .and_then(serde_json::Value::as_str)
+            .map(ToString::to_string),
+        allowed_scopes: registration_policy_config_values(
+            &config,
+            &CONFIG_ALLOWED_CLIENT_SCOPES_KEYS,
+        ),
+        allow_default_scopes: registration_policy_config_bool(
+            &config,
+            &CONFIG_ALLOW_DEFAULT_SCOPES_KEYS,
+        ),
+        config: serde_json::Value::Object(config),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use axum::extract::Query;
@@ -619,7 +759,38 @@ mod tests {
             {
                 "id": "component-1",
                 "name": "Allowed Client Scopes",
-                "providerId": super::DEFAULT_ALLOWED_CLIENT_SCOPES_PROVIDER
+                "providerId": super::DEFAULT_ALLOWED_CLIENT_SCOPES_PROVIDER,
+                "providerType": super::CLIENT_REG_POLICY_COMPONENT_TYPE,
+                "parentId": "realm-1",
+                "config": {
+                    "allowedClientScopes": ["scope-a", "scope-b"],
+                    "allowDefaultScopes": ["false"],
+                    "customOption": ["preserved"]
+                }
+            },
+            {
+                "id": "component-2",
+                "name": "Other Policy",
+                "providerId": "other-provider",
+                "providerType": super::CLIENT_REG_POLICY_COMPONENT_TYPE,
+                "parentId": "realm-1",
+                "config": {
+                    "allowed-client-scopes": "scope-c",
+                    "allow-default-scopes": " TrUe "
+                }
+            }
+        ]))
+    }
+
+    async fn registration_policy_providers_handler() -> Json<serde_json::Value> {
+        Json(json!([
+            {
+                "id": super::DEFAULT_ALLOWED_CLIENT_SCOPES_PROVIDER,
+                "helpText": "Restricts scopes available to dynamically registered clients."
+            },
+            {
+                "id": "other-provider",
+                "helpText": "Another registration policy provider."
             }
         ]))
     }
@@ -673,13 +844,18 @@ mod tests {
         let router = axum::Router::new().route("/admin/realms", get(realms_handler));
         let server = TestServer::spawn(router).await;
 
-        let config = build_config(server.base_url.clone(), UNUSED_KEYCLOAK_BASE_URL.to_string());
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
         let mcp = build_server(config);
 
         let ctx = auth_context(mcp.config.scope_map.realms.read.clone());
         let parts = parts_with_auth(ctx);
         let result = mcp
-            .realms_list(mcp_toolkit_core::rmcp::handler::server::tool::Extension(parts))
+            .realms_list(mcp_toolkit_core::rmcp::handler::server::tool::Extension(
+                parts,
+            ))
             .await
             .expect("realms list result");
 
@@ -706,7 +882,10 @@ mod tests {
         );
         let server = TestServer::spawn(router).await;
 
-        let config = build_config(server.base_url.clone(), UNUSED_KEYCLOAK_BASE_URL.to_string());
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
         let mcp = build_server(config);
 
         let ctx = auth_context(mcp.config.scope_map.realms.admin.clone());
@@ -739,6 +918,169 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn client_registration_policy_providers_list_returns_definitions() {
+        let router = axum::Router::new().route(
+            "/admin/realms/alpha/client-registration-policy/providers",
+            get(registration_policy_providers_handler),
+        );
+        let server = TestServer::spawn(router).await;
+
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
+        let mcp = build_server(config);
+        let ctx = auth_context(mcp.config.scope_map.realms.read.clone());
+        let parts = parts_with_auth(ctx);
+        let result = mcp
+            .client_registration_policy_providers_list(
+                mcp_toolkit_core::rmcp::handler::server::wrapper::Parameters(super::RealmArgs {
+                    realm: "alpha".to_string(),
+                }),
+                mcp_toolkit_core::rmcp::handler::server::tool::Extension(parts),
+            )
+            .await
+            .expect("client registration policy provider list result");
+
+        assert_eq!(
+            result.structured_content.expect("structured content"),
+            json!({
+                "providers": [
+                    {
+                        "id": super::DEFAULT_ALLOWED_CLIENT_SCOPES_PROVIDER,
+                        "help_text": "Restricts scopes available to dynamically registered clients."
+                    },
+                    {
+                        "id": "other-provider",
+                        "help_text": "Another registration policy provider."
+                    }
+                ]
+            })
+        );
+
+        server.shutdown();
+    }
+
+    #[tokio::test]
+    async fn client_registration_policies_list_returns_configured_instances() {
+        let router = axum::Router::new().route(
+            "/admin/realms/alpha/components",
+            get(registration_policy_components_handler),
+        );
+        let server = TestServer::spawn(router).await;
+
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
+        let mcp = build_server(config);
+        let ctx = auth_context(mcp.config.scope_map.realms.read.clone());
+        let parts = parts_with_auth(ctx);
+        let args = super::ClientRegistrationPolicyListArgs {
+            realm: "alpha".to_string(),
+            id: None,
+            name: None,
+            provider_id: None,
+        };
+        let result = mcp
+            .client_registration_policies_list(
+                mcp_toolkit_core::rmcp::handler::server::wrapper::Parameters(args),
+                mcp_toolkit_core::rmcp::handler::server::tool::Extension(parts),
+            )
+            .await
+            .expect("configured client registration policy list result");
+
+        assert_eq!(
+            result.structured_content.expect("structured content"),
+            json!({
+                "policies": [
+                    {
+                        "id": "component-1",
+                        "name": "Allowed Client Scopes",
+                        "provider_id": super::DEFAULT_ALLOWED_CLIENT_SCOPES_PROVIDER,
+                        "provider_type": super::CLIENT_REG_POLICY_COMPONENT_TYPE,
+                        "parent_id": "realm-1",
+                        "allowed_scopes": ["scope-a", "scope-b"],
+                        "allow_default_scopes": false,
+                        "config": {
+                            "allowedClientScopes": ["scope-a", "scope-b"],
+                            "allowDefaultScopes": ["false"],
+                            "customOption": ["preserved"]
+                        }
+                    },
+                    {
+                        "id": "component-2",
+                        "name": "Other Policy",
+                        "provider_id": "other-provider",
+                        "provider_type": super::CLIENT_REG_POLICY_COMPONENT_TYPE,
+                        "parent_id": "realm-1",
+                        "allowed_scopes": ["scope-c"],
+                        "allow_default_scopes": true,
+                        "config": {
+                            "allowed-client-scopes": "scope-c",
+                            "allow-default-scopes": " TrUe "
+                        }
+                    }
+                ]
+            })
+        );
+
+        server.shutdown();
+    }
+
+    #[tokio::test]
+    async fn client_registration_policies_get_defaults_to_allowed_scopes_provider() {
+        let router = axum::Router::new().route(
+            "/admin/realms/alpha/components",
+            get(registration_policy_components_handler),
+        );
+        let server = TestServer::spawn(router).await;
+
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
+        let mcp = build_server(config);
+        let ctx = auth_context(mcp.config.scope_map.realms.read.clone());
+        let parts = parts_with_auth(ctx);
+        let args = super::ClientRegistrationPolicyGetArgs {
+            realm: "alpha".to_string(),
+            id: None,
+            name: None,
+            provider_id: None,
+        };
+        let result = mcp
+            .client_registration_policies_get(
+                mcp_toolkit_core::rmcp::handler::server::wrapper::Parameters(args),
+                mcp_toolkit_core::rmcp::handler::server::tool::Extension(parts),
+            )
+            .await
+            .expect("configured client registration policy get result");
+
+        assert_eq!(
+            result.structured_content.expect("structured content"),
+            json!({
+                "policy": {
+                    "id": "component-1",
+                    "name": "Allowed Client Scopes",
+                    "provider_id": super::DEFAULT_ALLOWED_CLIENT_SCOPES_PROVIDER,
+                    "provider_type": super::CLIENT_REG_POLICY_COMPONENT_TYPE,
+                    "parent_id": "realm-1",
+                    "allowed_scopes": ["scope-a", "scope-b"],
+                    "allow_default_scopes": false,
+                    "config": {
+                        "allowedClientScopes": ["scope-a", "scope-b"],
+                        "allowDefaultScopes": ["false"],
+                        "customOption": ["preserved"]
+                    }
+                }
+            })
+        );
+
+        server.shutdown();
+    }
+
+    #[tokio::test]
     async fn client_registration_policies_create_returns_structured_output() {
         let router = axum::Router::new()
             .route("/admin/realms/alpha", get(realm_get_handler))
@@ -748,7 +1090,10 @@ mod tests {
             );
         let server = TestServer::spawn(router).await;
 
-        let config = build_config(server.base_url.clone(), UNUSED_KEYCLOAK_BASE_URL.to_string());
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
         let mcp = build_server(config);
 
         let ctx = auth_context(mcp.config.scope_map.realms.write.clone());
@@ -798,7 +1143,10 @@ mod tests {
             );
         let server = TestServer::spawn(router).await;
 
-        let config = build_config(server.base_url.clone(), UNUSED_KEYCLOAK_BASE_URL.to_string());
+        let config = build_config(
+            server.base_url.clone(),
+            UNUSED_KEYCLOAK_BASE_URL.to_string(),
+        );
         let mcp = build_server(config);
 
         let ctx = auth_context(mcp.config.scope_map.realms.write.clone());

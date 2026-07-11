@@ -74,6 +74,12 @@ Expected result:
 
 Optional policy update smoke:
 
+- Use `client_registration.policy_providers.list` to inspect the available
+  provider definitions, then use `client_registration.policies.list` and
+  `client_registration.policies.get` to inspect configured component instances.
+  Confirm the configured responses include the component id, normalized
+  `allowed_scopes` / `allow_default_scopes`, and the complete round-trip
+  `config` object.
 - Use any MCP client to call `client_registration.policies.create` with a token
   that includes `keycloak-admin:realm:write` and the configured
   `KC_ADMIN_MCP_ROLE_WRITE` value; the documented write-role default is
