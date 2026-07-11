@@ -1,15 +1,36 @@
 use super::*;
 
+async fn configured_registration_policy_components(
+    mcp: &KcAdminMcp,
+    ctx: &crate::auth::AuthContext,
+    realm: &str,
+) -> Result<Vec<serde_json::Value>, crate::McpError> {
+    let path = format!("/admin/realms/{realm}/components");
+    let query = vec![(
+        "type".to_string(),
+        CLIENT_REG_POLICY_COMPONENT_TYPE.to_string(),
+    )];
+    let payload = mcp
+        .gateway
+        .request_json(ctx, Method::GET, &path, query, None)
+        .await
+        .map_err(|_| crate::McpError::internal_error("gateway request failed", None))?;
+    Ok(match payload {
+        serde_json::Value::Array(items) => items,
+        _ => Vec::new(),
+    })
+}
+
 #[mcp_toolkit_core::rmcp::tool_router(router = tool_router_realms_registration, vis = "pub")]
 impl KcAdminMcp {
-    /// List client registration policy providers for a realm.
+    /// List available client registration policy provider definitions for a realm.
     /// Delegates to the Keycloak admin API via kc-admin-gateway.
     /// Required scopes: `keycloak-admin:realm:read` (configurable); safety: read-only.
     #[tool(
-        name = "client_registration.policies.list",
-        description = "List client registration policy providers for a realm."
+        name = "client_registration.policy_providers.list",
+        description = "List available client registration policy provider definitions for a realm. This does not return configured policy instances."
     )]
-    pub(crate) async fn client_registration_policies_list(
+    pub(crate) async fn client_registration_policy_providers_list(
         &self,
         Parameters(args): Parameters<RealmArgs>,
         Extension(parts): Extension<Parts>,
@@ -36,13 +57,15 @@ impl KcAdminMcp {
             .await
             .map_err(|_| crate::McpError::internal_error("gateway request failed", None))?;
 
-        let policies: Vec<ClientRegistrationPolicySummary> = match payload {
+        let providers: Vec<ClientRegistrationPolicyProviderSummary> = match payload {
             serde_json::Value::Array(items) => items
                 .into_iter()
-                .filter_map(|item| serde_json::from_value::<ClientRegistrationPolicy>(item).ok())
-                .map(|policy| ClientRegistrationPolicySummary {
-                    id: policy.id,
-                    help_text: policy
+                .filter_map(|item| {
+                    serde_json::from_value::<ClientRegistrationPolicyProvider>(item).ok()
+                })
+                .map(|provider| ClientRegistrationPolicyProviderSummary {
+                    id: provider.id,
+                    help_text: provider
                         .help_text
                         .map(|value| value.chars().take(MAX_DESC_LEN).collect()),
                 })
@@ -50,7 +73,109 @@ impl KcAdminMcp {
             _ => Vec::new(),
         };
 
+        Ok(CallToolResult::structured(
+            json!({ "providers": providers }),
+        ))
+    }
+
+    /// List configured client registration policy components for a realm.
+    /// Delegates to the Keycloak admin API via kc-admin-gateway.
+    /// Required scopes: `keycloak-admin:realm:read` (configurable); safety: read-only.
+    #[tool(
+        name = "client_registration.policies.list",
+        description = "List configured client registration policy instances, including component ids and round-trip configuration. Optional selectors filter by id, name, or provider id."
+    )]
+    pub(crate) async fn client_registration_policies_list(
+        &self,
+        Parameters(args): Parameters<ClientRegistrationPolicyListArgs>,
+        Extension(parts): Extension<Parts>,
+    ) -> Result<CallToolResult, crate::McpError> {
+        let ctx = match auth_from_parts(&parts) {
+            Ok(ctx) => ctx,
+            Err(err) => return Ok(err),
+        };
+        let scopes = &self.config.scope_map.realms.read;
+        if let Err(err) = require_scopes(&ctx, scopes) {
+            return Ok(err);
+        }
+        if let Err(err) = require_roles_for_scopes(&ctx, scopes, &self.config) {
+            return Ok(err);
+        }
+
+        let components = configured_registration_policy_components(self, &ctx, &args.realm).await?;
+        let selected = if args.id.is_none() && args.name.is_none() && args.provider_id.is_none() {
+            (0..components.len()).collect::<Vec<_>>()
+        } else {
+            match_registration_policy_components(
+                &components,
+                args.id.as_deref(),
+                args.name.as_deref(),
+                args.provider_id.as_deref(),
+            )
+        };
+        let policies = selected
+            .into_iter()
+            .filter_map(|idx| components.get(idx))
+            .filter_map(summarize_registration_policy_component)
+            .collect::<Vec<_>>();
+
         Ok(CallToolResult::structured(json!({ "policies": policies })))
+    }
+
+    /// Fetch one configured client registration policy component for a realm.
+    /// Delegates to the Keycloak admin API via kc-admin-gateway.
+    /// Required scopes: `keycloak-admin:realm:read` (configurable); safety: read-only.
+    #[tool(
+        name = "client_registration.policies.get",
+        description = "Fetch one configured client registration policy instance by id, name, or provider id. Omitting selectors targets the default Allowed Client Scopes provider."
+    )]
+    pub(crate) async fn client_registration_policies_get(
+        &self,
+        Parameters(args): Parameters<ClientRegistrationPolicyGetArgs>,
+        Extension(parts): Extension<Parts>,
+    ) -> Result<CallToolResult, crate::McpError> {
+        let ctx = match auth_from_parts(&parts) {
+            Ok(ctx) => ctx,
+            Err(err) => return Ok(err),
+        };
+        let scopes = &self.config.scope_map.realms.read;
+        if let Err(err) = require_scopes(&ctx, scopes) {
+            return Ok(err);
+        }
+        if let Err(err) = require_roles_for_scopes(&ctx, scopes, &self.config) {
+            return Ok(err);
+        }
+
+        let provider_id =
+            resolve_registration_policy_provider_id(&args.id, &args.name, &args.provider_id);
+        let components = configured_registration_policy_components(self, &ctx, &args.realm).await?;
+        let matches = match_registration_policy_components(
+            &components,
+            args.id.as_deref(),
+            args.name.as_deref(),
+            provider_id.as_deref(),
+        );
+        if matches.is_empty() {
+            return Ok(tool_error(
+                "client_registration.policies.not_found",
+                "No matching client registration policy component found.",
+                &ctx.request_id,
+            ));
+        }
+        if matches.len() > 1 {
+            return Ok(tool_error(
+                "client_registration.policies.ambiguous",
+                "Multiple registration policy components matched. Specify id or name.",
+                &ctx.request_id,
+            ));
+        }
+        let policy = matches
+            .first()
+            .and_then(|idx| components.get(*idx))
+            .and_then(summarize_registration_policy_component)
+            .ok_or_else(|| crate::McpError::internal_error("component is not an object", None))?;
+
+        Ok(CallToolResult::structured(json!({ "policy": policy })))
     }
 
     /// Create a client registration policy component (Allowed Client Scopes).
@@ -194,21 +319,7 @@ impl KcAdminMcp {
         let provider_id =
             resolve_registration_policy_provider_id(&args.id, &args.name, &args.provider_id);
 
-        let path = format!("/admin/realms/{}/components", args.realm);
-        let query = vec![(
-            "type".to_string(),
-            CLIENT_REG_POLICY_COMPONENT_TYPE.to_string(),
-        )];
-        let payload = self
-            .gateway
-            .request_json(&ctx, Method::GET, &path, query, None)
-            .await
-            .map_err(|_| crate::McpError::internal_error("gateway request failed", None))?;
-
-        let components: Vec<serde_json::Value> = match payload {
-            serde_json::Value::Array(items) => items,
-            _ => Vec::new(),
-        };
+        let components = configured_registration_policy_components(self, &ctx, &args.realm).await?;
 
         let matches = match_registration_policy_components(
             &components,
@@ -318,21 +429,7 @@ impl KcAdminMcp {
         let provider_id =
             resolve_registration_policy_provider_id(&args.id, &args.name, &args.provider_id);
 
-        let path = format!("/admin/realms/{}/components", args.realm);
-        let query = vec![(
-            "type".to_string(),
-            CLIENT_REG_POLICY_COMPONENT_TYPE.to_string(),
-        )];
-        let payload = self
-            .gateway
-            .request_json(&ctx, Method::GET, &path, query, None)
-            .await
-            .map_err(|_| crate::McpError::internal_error("gateway request failed", None))?;
-
-        let components: Vec<serde_json::Value> = match payload {
-            serde_json::Value::Array(items) => items,
-            _ => Vec::new(),
-        };
+        let components = configured_registration_policy_components(self, &ctx, &args.realm).await?;
 
         let matches = match_registration_policy_components(
             &components,

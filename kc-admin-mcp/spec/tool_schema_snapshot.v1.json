@@ -297,10 +297,68 @@
       "name": "client_registration.policies.delete"
     },
     {
-      "description": "List client registration policy providers for a realm.",
+      "description": "Fetch one configured client registration policy instance by id, name, or provider id. Omitting selectors targets the default Allowed Client Scopes provider.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "properties": {
+          "id": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider_id": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "type": "object"
+      },
+      "name": "client_registration.policies.get"
+    },
+    {
+      "description": "List configured client registration policy instances, including component ids and round-trip configuration. Optional selectors filter by id, name, or provider id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider_id": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "realm": {
             "type": "string"
           }
@@ -362,6 +420,22 @@
         "type": "object"
       },
       "name": "client_registration.policies.update"
+    },
+    {
+      "description": "List available client registration policy provider definitions for a realm. This does not return configured policy instances.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "realm": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "realm"
+        ],
+        "type": "object"
+      },
+      "name": "client_registration.policy_providers.list"
     },
     {
       "description": "Create a client scope.",
