@@ -621,13 +621,23 @@ fn registration_policy_config_bool(
     config: &serde_json::Map<String, serde_json::Value>,
     keys: &[&str],
 ) -> Option<bool> {
+    let parse_text = |value: &str| {
+        let value = value.trim();
+        if value.eq_ignore_ascii_case("true") {
+            Some(true)
+        } else if value.eq_ignore_ascii_case("false") {
+            Some(false)
+        } else {
+            None
+        }
+    };
     let value = keys.iter().find_map(|key| config.get(*key))?;
     match value {
         serde_json::Value::Bool(value) => Some(*value),
-        serde_json::Value::String(value) => value.parse().ok(),
+        serde_json::Value::String(value) => parse_text(value),
         serde_json::Value::Array(values) => values.first().and_then(|value| match value {
             serde_json::Value::Bool(value) => Some(*value),
-            serde_json::Value::String(value) => value.parse().ok(),
+            serde_json::Value::String(value) => parse_text(value),
             _ => None,
         }),
         _ => None,
@@ -766,7 +776,7 @@ mod tests {
                 "parentId": "realm-1",
                 "config": {
                     "allowed-client-scopes": "scope-c",
-                    "allow-default-scopes": true
+                    "allow-default-scopes": " TrUe "
                 }
             }
         ]))
@@ -1008,7 +1018,7 @@ mod tests {
                         "allow_default_scopes": true,
                         "config": {
                             "allowed-client-scopes": "scope-c",
-                            "allow-default-scopes": true
+                            "allow-default-scopes": " TrUe "
                         }
                     }
                 ]
