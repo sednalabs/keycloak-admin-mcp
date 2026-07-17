@@ -77,7 +77,7 @@ jobs:
         # github/codeql-action v4
         id: setup-codeql
         if: steps.changes.outputs.run_queries == 'true'
-        uses: github/codeql-action/setup-codeql@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a
+        uses: github/codeql-action/setup-codeql@7188fc363630916deb702c7fdcf4e481b751f97a
 
       - name: Install query pack dependencies
         if: steps.changes.outputs.run_queries == 'true'

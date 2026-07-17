@@ -187,26 +187,26 @@ jobs:
 
       - name: Attest kc-admin-gateway build provenance
         # actions/attest v4.1.1
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
         with:
           subject-path: dist/kc-admin-gateway
 
       - name: Attest kc-admin-gateway SBOM
         # actions/attest v4.1.1
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
         with:
           subject-path: dist/kc-admin-gateway
           sbom-path: dist/kc-admin-gateway.x86_64-unknown-linux-gnu.cdx.json
 
       - name: Attest kc-admin-mcp build provenance
         # actions/attest v4.1.1
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
         with:
           subject-path: dist/kc-admin-mcp
 
       - name: Attest kc-admin-mcp SBOM
         # actions/attest v4.1.1
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6
         with:
           subject-path: dist/kc-admin-mcp
           sbom-path: dist/kc-admin-mcp.x86_64-unknown-linux-gnu.cdx.json
