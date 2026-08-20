@@ -28,7 +28,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout keycloak-admin-mcp
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
 
@@ -38,7 +38,7 @@ jobs:
           toolchain: stable
 
       - name: Cache cargo artifacts
-        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16
 
       - name: Test kc-admin-gateway
         run: cargo test --locked -p kc-admin-gateway
