@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Checkout
         # actions/checkout v6
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -29,11 +29,11 @@ jobs:
 
       - name: Cache cargo artifacts
         # Swatinem/rust-cache v2
-        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16
 
       - name: Install governance tools
         # taiki-e/install-action v2
-        uses: taiki-e/install-action@4684b8405694ae9dd42c9f39ba901a70ae83f4a3
+        uses: taiki-e/install-action@9534c84618278caac52cb373bb164ed464dbd8af
         with:
           tool: cargo-deny,cargo-audit,cargo-outdated
 
