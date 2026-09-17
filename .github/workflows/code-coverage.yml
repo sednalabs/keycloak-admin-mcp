@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Checkout repository
         # actions/checkout v6
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -39,11 +39,11 @@ jobs:
 
       - name: Cache cargo artifacts
         # swatinem/rust-cache v2
-        uses: swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        uses: swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16
 
       - name: Install coverage tool
         # taiki-e/install-action v2
-        uses: taiki-e/install-action@4684b8405694ae9dd42c9f39ba901a70ae83f4a3
+        uses: taiki-e/install-action@3f74d7c16a4242f1c95561e98edc25d36adb4375
         with:
           tool: cargo-llvm-cov
 
@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload Rust coverage to GitHub Code Quality
         # actions/upload-code-coverage v1
-        uses: actions/upload-code-coverage@abb5995db9e0199b0e2bb9dbd136fce4cb1ec4d3
+        uses: actions/upload-code-coverage@d8e329117199404bba6fc81efe8093dc7c015e34
         with:
           file: coverage/rust.xml
           language: Rust
